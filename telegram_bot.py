@@ -3,6 +3,13 @@ import telebot
 
 # Custom modules to import
 from wnw_bot_api_token import token as api_token
+import packing
+import routines
+import wardrobe
+import reminder
+
+import speech_to_text
+import nlu_module
 
 # Initialize the bot with the API token
 bot = telebot.TeleBot(api_token, parse_mode=None)  # You can set parse_mode by default. HTML or MARKDOWN
@@ -27,6 +34,42 @@ def handle_command(message):
     # Call the function to send a welcome message
     if message.text == "/start":
         send_welcome(message)
+
+# Function to interpret the user's intent if it is not a command
+@bot.message_handler(content_types=['text'])
+def handle_text(message):
+    intent = nlu_module.detect_intent(message.text)
+    if intent == "packing":
+        packing.handle_packing(bot, message)
+    elif intent == "morning_routine":
+        routines.handle_morning_routine(bot, message)
+    elif intent == "wardrobe":
+        wardrobe.handle_wardrobe(bot, message)
+    elif intent == "reminder":
+        reminder.handle_reminder(bot, message)
+    else:
+        bot.reply_to(message, "Sorry, I didn't understand. Please try again.")
+
+# Function to handle voice messages
+@bot.message_handler(content_types=['voice'])
+def handle_voice(message):
+    text = speech_to_text.transcribe_voice(bot, message)
+    if text:
+        intent = nlu_module.detect_intent(text)
+        # Optional: bot.reply_to(message, f"You said: {text}")
+        if intent == "packing":
+            packing.handle_packing(bot, message, text)
+        elif intent == "morning_routine":
+            routines.handle_morning_routine(bot, message, text)
+        elif intent == "wardrobe":
+            wardrobe.handle_wardrobe(bot, message, text)
+        elif intent == "reminder":
+            reminder.handle_reminder(bot, message, text)
+        else:
+            bot.reply_to(message, "Sorry, I didn't understand your voice message.")
+    else:
+        bot.reply_to(message, "Sorry, I couldn't understand your voice message.")
+
 
 # Set the bot commands    
 bot.set_my_commands([
