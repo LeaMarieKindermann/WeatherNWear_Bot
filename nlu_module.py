@@ -1,4 +1,4 @@
-def detect_intent(text):
+def detect_intent(text, language):
     """
     Detects the intent of the given text.
     

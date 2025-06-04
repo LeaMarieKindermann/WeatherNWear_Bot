@@ -1,4 +1,4 @@
-def handle_routine(bot, message):
+def handle_routine(bot, message, language):
     """
     Handle the routine command.
     This function is called to handle routine-related requests from the user.

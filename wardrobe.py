@@ -1,4 +1,4 @@
-def handle_wardrobe(bot, message):
+def handle_wardrobe(bot, message, language):
     """
     Handle the wardrobe command.
     This function is called when the intent of the user is found to be wardrobe.

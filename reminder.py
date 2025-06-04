@@ -1,4 +1,4 @@
-def handle_reminder(bot, message):
+def handle_reminder(bot, message, language):
     """
     Handle the reminder command.
     This function is called when the intent of the user is found to be reminder.

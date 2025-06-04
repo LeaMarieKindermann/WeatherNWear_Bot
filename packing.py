@@ -1,4 +1,4 @@
-def handle_packing(bot, message):
+def handle_packing(bot, message, language):
     """
     Handle the packing command.
     This function is called when the intend of the user is found to be packing.

@@ -53,20 +53,37 @@ def handle_text(message):
 # Function to handle voice messages
 @bot.message_handler(content_types=['voice'])
 def handle_voice(message):
-    text = speech_to_text.transcribe_voice(bot, message)
+    text, language = speech_to_text.transcribe_voice(bot, message)
+    
     if text:
-        intent = nlu_module.detect_intent(text)
-        # Optional: bot.reply_to(message, f"You said: {text}")
-        if intent == "packing":
-            packing.handle_packing(bot, message, text)
-        elif intent == "morning_routine":
-            routines.handle_morning_routine(bot, message, text)
-        elif intent == "wardrobe":
-            wardrobe.handle_wardrobe(bot, message, text)
-        elif intent == "reminder":
-            reminder.handle_reminder(bot, message, text)
-        else:
-            bot.reply_to(message, "Sorry, I didn't understand your voice message.")
+        print(f"Input: {text}, Language: {language}")
+        match language:
+            case "de":
+                intent = nlu_module.detect_intent(text, language)
+                # Optional: bot.reply_to(message, f"You said: {text}")
+                if intent == "packing":
+                    packing.handle_packing(bot, message, text, language)
+                elif intent == "morning_routine":
+                    routines.handle_morning_routine(bot, message, text, language)
+                elif intent == "wardrobe":
+                    wardrobe.handle_wardrobe(bot, message, text, language)
+                elif intent == "reminder":
+                    reminder.handle_reminder(bot, message, text, language)
+                else:
+                    bot.reply_to(message, f"Es tut mir leid, ich habe dich nicht verstanden. Ich habe nur verstanden: {text}.")
+            case "en":
+                intent = nlu_module.detect_intent(text, language)
+                # Optional: bot.reply_to(message, f"You said: {text}")
+                if intent == "packing":
+                    packing.handle_packing(bot, message, text, language)
+                elif intent == "morning_routine":
+                    routines.handle_morning_routine(bot, message, text, language)
+                elif intent == "wardrobe":
+                    wardrobe.handle_wardrobe(bot, message, text, language)
+                elif intent == "reminder":
+                    reminder.handle_reminder(bot, message, text, language)
+                else:
+                    bot.reply_to(message, f"Sorry, I didn't understand your intent, I understood {text}.")
     else:
         bot.reply_to(message, "Sorry, I couldn't understand your voice message.")
 
