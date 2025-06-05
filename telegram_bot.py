@@ -11,6 +11,9 @@ import reminder
 import speech_to_text
 import intent_detection
 
+# For asynchronous operations
+import threading
+
 # Initialize the bot with the API token
 bot = telebot.TeleBot(api_token, parse_mode=None)  # You can set parse_mode by default. HTML or MARKDOWN
 
@@ -39,15 +42,16 @@ def handle_command(message):
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
     text = message.text
-    intent = intent_detection.detect_intent(text, "de")
+    language = speech_to_text.detect_language(text)
+    intent = intent_detection.detect_intent(text, language)
     if intent == "packing":
-        packing.handle_packing(bot, message, text, "de")
+        packing.handle_packing(bot, message, text, language)
     elif intent == "routine":
-        routines.handle_routine(bot, message, text, "de")
+        routines.handle_routine(bot, message, text, language)
     elif intent == "wardrobe":
-        wardrobe.handle_wardrobe(bot, message, text, "de")
+        wardrobe.handle_wardrobe(bot, message, text, language)
     elif intent == "reminder":
-        reminder.handle_reminder(bot, message, text, "de")
+        reminder.handle_reminder(bot, message, text, language)
     else:
         bot.reply_to(message, "Sorry, I didn't understand. Please try again.")
 
@@ -93,6 +97,9 @@ def handle_voice(message):
 bot.set_my_commands([
     telebot.types.BotCommand("start", "Greetings")
 ])
+
+# Start the check_reminders thread
+threading.Thread(target=reminder.check_reminders, args=(bot,), daemon=True).start()
 
 # Start the bot
 bot.infinity_polling()

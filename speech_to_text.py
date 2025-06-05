@@ -7,6 +7,23 @@ ogg_path = "temp.ogg"
 wav_path = "temp.wav"
 
 """
+Helper function to detect the language of a given text.
+
+----
+Args:
+    text (str): The text to analyze.
+"""
+def detect_language(text):
+    """
+    Detect the language of a given text using langdetect.
+    Returns the ISO language code (e.g. 'de', 'en').
+    """
+    try:
+        return detect(text)
+    except Exception:
+        return None
+
+"""
 Transcribe voice messages to text.
 This function is called when the user sends a voice message.
 It uses the Google Speech Recognition API to transcribe the voice message
@@ -48,7 +65,7 @@ def transcribe_voice(bot, message, languages=["de-DE", "en-US"]):  # Corrected l
     # Try to detect the language from recognized texts
     for lang, text in results.items():
         try:
-            detected = detect(text)
+            detected = detect_language(text)
             if lang.lower().startswith(detected.lower()):
                 # Return both text and detected language code
                 return text, detected
