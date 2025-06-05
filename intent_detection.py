@@ -24,7 +24,7 @@ def detect_intent(text, language):
     reminder_en = ["reminder", "remind", "don't forget", "remember", "notify"]
 
     # Helper function: fuzzy match for similar words
-    def fuzzy_match(text, keywords, threshold=80):
+    def fuzzy_match(text, keywords, threshold=90):
         return any(fuzz.partial_ratio(text, word) > threshold for word in keywords)
 
     # Dictionary for all intents and their keywords per language
