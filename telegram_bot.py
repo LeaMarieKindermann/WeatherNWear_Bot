@@ -38,15 +38,16 @@ def handle_command(message):
 # Function to interpret the user's intent if it is not a command
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
-    intent = nlu_module.detect_intent(message.text)
+    text = message.text
+    intent = nlu_module.detect_intent(text, "de")
     if intent == "packing":
-        packing.handle_packing(bot, message)
+        packing.handle_packing(bot, message, text, "de")
     elif intent == "morning_routine":
-        routines.handle_morning_routine(bot, message)
+        routines.handle_morning_routine(bot, message, text, "de")
     elif intent == "wardrobe":
-        wardrobe.handle_wardrobe(bot, message)
+        wardrobe.handle_wardrobe(bot, message, text, "de")
     elif intent == "reminder":
-        reminder.handle_reminder(bot, message)
+        reminder.handle_reminder(bot, message, text, "de")
     else:
         bot.reply_to(message, "Sorry, I didn't understand. Please try again.")
 
