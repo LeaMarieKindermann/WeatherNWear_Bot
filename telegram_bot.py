@@ -9,7 +9,7 @@ import wardrobe
 import reminder
 
 import speech_to_text
-import nlu_module
+import intent_detection
 
 # Initialize the bot with the API token
 bot = telebot.TeleBot(api_token, parse_mode=None)  # You can set parse_mode by default. HTML or MARKDOWN
@@ -39,11 +39,11 @@ def handle_command(message):
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
     text = message.text
-    intent = nlu_module.detect_intent(text, "de")
+    intent = intent_detection.detect_intent(text, "de")
     if intent == "packing":
         packing.handle_packing(bot, message, text, "de")
-    elif intent == "morning_routine":
-        routines.handle_morning_routine(bot, message, text, "de")
+    elif intent == "routine":
+        routines.handle_routine(bot, message, text, "de")
     elif intent == "wardrobe":
         wardrobe.handle_wardrobe(bot, message, text, "de")
     elif intent == "reminder":
@@ -60,12 +60,12 @@ def handle_voice(message):
         print(f"Input: {text}, Language: {language}")
         match language:
             case "de":
-                intent = nlu_module.detect_intent(text, language)
+                intent = intent_detection.detect_intent(text, language)
                 # Optional: bot.reply_to(message, f"You said: {text}")
                 if intent == "packing":
                     packing.handle_packing(bot, message, text, language)
-                elif intent == "morning_routine":
-                    routines.handle_morning_routine(bot, message, text, language)
+                elif intent == "routine":
+                    routines.handle_routine(bot, message, text, language)
                 elif intent == "wardrobe":
                     wardrobe.handle_wardrobe(bot, message, text, language)
                 elif intent == "reminder":
@@ -73,12 +73,12 @@ def handle_voice(message):
                 else:
                     bot.reply_to(message, f"Es tut mir leid, ich habe dich nicht verstanden. Ich habe nur verstanden: {text}.")
             case "en":
-                intent = nlu_module.detect_intent(text, language)
+                intent = intent_detection.detect_intent(text, language)
                 # Optional: bot.reply_to(message, f"You said: {text}")
                 if intent == "packing":
                     packing.handle_packing(bot, message, text, language)
-                elif intent == "morning_routine":
-                    routines.handle_morning_routine(bot, message, text, language)
+                elif intent == "routine":
+                    routines.handle_routine(bot, message, text, language)
                 elif intent == "wardrobe":
                     wardrobe.handle_wardrobe(bot, message, text, language)
                 elif intent == "reminder":
