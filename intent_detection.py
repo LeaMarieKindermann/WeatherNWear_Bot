@@ -17,11 +17,13 @@ def detect_intent(text, language):
     routine_de = ["routine", "jeden morgen", "täglich", "immer um", "zeitplan", "morgens"]
     wardrobe_de = ["anziehen", "kleidung", "outfit", "was soll ich anziehen", "kleiderwahl"]
     reminder_de = ["erinnerung", "erinnere", "nicht vergessen", "denk daran", "benachrichtige"]
+    weather_de = ["wetter", "wie ist das wetter", "regen", "sonnig", "vorhersage", "wie wird das wetter", "sag mir das wetter"]
 
     packing_en = ["pack", "packing", "trip", "suitcase", "take with me", "travel", "what should I pack"]
     routine_en = ["routine", "every morning", "daily", "always at", "schedule", "morning"]
     wardrobe_en = ["wear", "clothes", "outfit", "what should I wear", "wardrobe"]
     reminder_en = ["reminder", "remind", "don't forget", "remember", "notify"]
+    weather_en = ["weather", "how is the weather", "forecast", "raining", "sunny", "what is the weather like", "Whats the weather like"]
 
     # Helper function: fuzzy match for similar words
     def fuzzy_match(text, keywords, threshold=90):
@@ -33,6 +35,7 @@ def detect_intent(text, language):
         "routine": {"de": routine_de, "en": routine_en},
         "wardrobe": {"de": wardrobe_de, "en": wardrobe_en},
         "reminder": {"de": reminder_de, "en": reminder_en},
+        "weather": {"de": weather_de, "en": weather_en},
     }
 
     # Try to match intent using the detected language

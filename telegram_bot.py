@@ -7,6 +7,7 @@ import packing
 import routines
 import wardrobe
 import reminder
+import weather
 
 import speech_to_text
 import intent_detection
@@ -52,6 +53,8 @@ def handle_text(message):
         wardrobe.handle_wardrobe(bot, message, text, language)
     elif intent == "reminder":
         reminder.handle_reminder(bot, message, text, language)
+    elif intent == "weather":
+        weather.handle_weather(bot, message, text, language)
     else:
         if language == "de":
             bot.reply_to(message, "Es tut mir leid, ich habe dich nicht verstanden. Bitte versuche es erneut.")

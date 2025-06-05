@@ -1,3 +1,4 @@
 # Store the Telegram Bot API token here
 # Bot Name: @WeatherNWear_bot
-token = "7924259968:AAEG_C9Du47gZhl_Xo9p07G7UtTfLu-hJwA"
+token = "7942080169:AAGQZ9N6evrw2-wjG4MDfEdRIQwcb7qEGyk"
+weather_API_TOKEN = "a5b3761e220f4532819163518250406"
