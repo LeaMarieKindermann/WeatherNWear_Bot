@@ -53,7 +53,10 @@ def handle_text(message):
     elif intent == "reminder":
         reminder.handle_reminder(bot, message, text, language)
     else:
-        bot.reply_to(message, "Sorry, I didn't understand. Please try again.")
+        if language == "de":
+            bot.reply_to(message, "Es tut mir leid, ich habe dich nicht verstanden. Bitte versuche es erneut.")
+        elif language == "en":
+            bot.reply_to(message, "Sorry, I didn't understand. Please try again.")
 
 # Function to handle voice messages
 @bot.message_handler(content_types=['voice'])
