@@ -37,7 +37,11 @@ def handle_command(message):
     
     # Call the function to send a welcome message
     if message.text == "/start":
-        send_welcome(message)
+        send_welcome(message)        
+        wardrobe.get_or_create_user_wardrobe(message.chat.id)
+        # get the user's Telegram interface language
+        user_lang = getattr(message.from_user, "language_code", None)
+        print(f"User Telegram language_code: {user_lang}")
 
 # Function to interpret the user's intent if it is not a command
 @bot.message_handler(content_types=['text'])
