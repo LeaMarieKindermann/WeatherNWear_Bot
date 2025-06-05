@@ -204,7 +204,8 @@ def extract_reminder_info(text, language):
         # Remove all relative time expressions (short and long forms)
         what = re.sub(r"\bin \d+\s*(minutes?|min|hours?|h)\b", "", what, flags=re.IGNORECASE)
         what = re.sub(r"\bin an hour\b", "", what, flags=re.IGNORECASE)
-        what = re.sub(r"\bat \d{1,2}(:\d{2})?\s*(am|pm)?\s*to\b", "", what, flags=re.IGNORECASE)
+        # Remove absolute time expressions like "at 3:15pm", "at 3pm", "at 15:15", "at 3:15pm for"
+        what = re.sub(r"\bat \d{1,2}(:\d{2})?\s*(am|pm)?(\s*for)?\b", "", what, flags=re.IGNORECASE)
 
     what = what.strip(" ,.:;-").strip()
     if not what and time_str:
@@ -363,17 +364,20 @@ def check_reminders(bot):
 
         changed = False
         for chat_id, reminder_list in list(reminders.items()):
-            for reminder in reminder_list[:]: # copy the list to avoid modifying it while iterating
+            for reminder in reminder_list[:]:  # copy the list to avoid modifying it while iterating
                 reminder_time = reminder["time"]
                 try:
                     now_dt = datetime.now()
                     reminder_dt = datetime.strptime(reminder_time, "%Y-%m-%d %H:%M")
                     if now_dt >= reminder_dt:
-                        # Send reminder and remove it
-                        if reminder["language"] == "de":
-                            bot.send_message(chat_id, f"Erinnerung: {reminder['what']}")
-                        else:
-                            bot.send_message(chat_id, f"Reminder: {reminder['what']}")
+                        # Only send if is now (±1 minute)
+                        if 0 <= (now_dt - reminder_dt).total_seconds() < 60:
+                            if reminder["language"] == "de":
+                                bot.send_message(chat_id, f"Erinnerung: {reminder['what']}")
+                            else:
+                                bot.send_message(chat_id, f"Reminder: {reminder['what']}")
+                        # delete the reminder after sending
+                        print(f"Removing reminder for chat {chat_id}: {reminder['what']} at {reminder_time}")
                         reminder_list.remove(reminder)
                         changed = True
                 except Exception as e:
