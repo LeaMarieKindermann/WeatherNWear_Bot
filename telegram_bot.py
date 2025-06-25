@@ -49,10 +49,15 @@ def handle_text(message):
     text = message.text
     language = speech_to_text.detect_language(text)
     intent = intent_detection.detect_intent(text, language)
+    print("Intent: " + intent)
     if intent == "packing":
         packing.handle_packing(bot, message, text, language)
     elif intent == "routine":
         routines.handle_routine(bot, message, text, language)
+    elif intent == "routine_list":
+        routines.handle_routine(bot, message, "/routines", language)
+    elif intent == "routine_delete":
+        routines.handle_routine(bot, message, "/delete_routine", language)
     elif intent == "wardrobe":
         wardrobe.handle_wardrobe(bot, message, text, language)
     elif intent == "reminder":
@@ -105,7 +110,9 @@ def handle_voice(message):
 
 # Set the bot commands    
 bot.set_my_commands([
-    telebot.types.BotCommand("start", "Greetings")
+    telebot.types.BotCommand("start", "Greetings"),
+    telebot.types.BotCommand("routines", "Set Routine"),
+    telebot.types.BotCommand("delete_routine", "Delete a Routine")
 ])
 
 # Start the check_reminders thread

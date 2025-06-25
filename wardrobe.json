@@ -1,0 +1,30 @@
+{
+  "7807161636": [
+    {
+      "Oberteile": [
+        "T-Shirt",
+        "Pullover",
+        "Hemd",
+        "Sweatshirt"
+      ],
+      "Hosen": [
+        "Jeans",
+        "Jogginghose",
+        "Shorts"
+      ],
+      "Jacken": [
+        "Jacke",
+        "Mantel",
+        "Regenjacke"
+      ],
+      "Schuhe": [
+        "Sneaker",
+        "Stiefel"
+      ],
+      "Accessoires": [
+        "Mütze",
+        "Schal"
+      ]
+    }
+  ]
+}
