@@ -174,3 +174,25 @@ def handle_weather(bot, message, text, language):
         bot.reply_to(message, weather['text'])
     else:
         bot.reply_to(message, f"⚠️ Wetterdaten für '{location}' konnten nicht geladen werden.")
+
+def handle_weather_location(bot, message, location):
+    forecast_texts = []
+    intro = f"📍 {location} \n 3-Tage-Wettervorhersage:\n\n"
+
+    labels = {
+        0: "🌤 Heute",
+        1: "🌥 Morgen",
+        2: "🌧 Übermorgen"
+    }
+
+    for day in range(3):
+        weather = get_weather(location, "de", day)
+        if weather:
+            forecast_texts.append(f"{labels.get(day)}:\n{weather['text'].split(':', 1)[1].strip()}")
+        else:
+            forecast_texts.append(f"{labels.get(day)}: ⚠️ Leider keine Wetterdaten verfügbar.")
+
+    outro = "\n\n❗ Hinweis: Wetterdaten können sich kurzfristig ändern."
+    full_forecast = intro + "\n\n".join(forecast_texts) + outro
+
+    bot.reply_to(message, full_forecast)

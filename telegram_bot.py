@@ -8,6 +8,7 @@ import routines
 import wardrobe
 import reminder
 import weather
+import requests
 
 import speech_to_text
 import intent_detection
@@ -69,6 +70,47 @@ def handle_text(message):
             bot.reply_to(message, "Es tut mir leid, ich habe dich nicht verstanden. Bitte versuche es erneut.")
         elif language == "en":
             bot.reply_to(message, "Sorry, I didn't understand. Please try again.")
+
+def get_location_from_coordinates(latitude, longitude):
+    """
+        Function to get location from coordinates
+    """
+    api_key = "308c9d73d642a0eb49da31de1fefd3ed"
+    url = f"http://api.openweathermap.org/geo/1.0/reverse?lat={latitude}&lon={longitude}&limit=1&appid={api_key}"
+
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+
+        # parse answer as JSON
+        data = response.json()
+
+        # If data is returned, then extract the location
+        if data:
+            location = data[0]
+            city = location.get('name', 'Unbekannt')
+            country = location.get('country', 'Unbekannt')
+            return f"{city}, {country}"
+        else:
+            return "Ort konnte nicht gefunden werden."
+    except requests.exceptions.RequestException as e:
+        print(f"Fehler bei der Anfrage: {e}")
+        return "Fehler bei der Abfrage der Geolocation."
+
+@bot.message_handler(content_types=['location', 'venue'])
+def handle_location_or_venue(message):
+    """
+        Function to get location from venue
+    """
+    if message.content_type == 'venue':
+        latitude = message.venue.location.latitude
+        longitude = message.venue.location.longitude
+    else:
+        latitude = message.location.latitude
+        longitude = message.location.longitude
+
+    location = get_location_from_coordinates(latitude, longitude)
+    weather.handle_weather_location(bot, message, location)
 
 # Function to handle voice messages
 @bot.message_handler(content_types=['voice'])
