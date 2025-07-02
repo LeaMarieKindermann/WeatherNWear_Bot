@@ -15,28 +15,28 @@ WARDROBE_PATH = "wardrobe.json"
 def get_default_wardrobe_de():
     return {
         "Oberteile": [
-            {"name": "Pullover", "min_temp": -20, "max_temp": 18, "prio": 1},
-            {"name": "Sweatshirt", "min_temp": -10, "max_temp": 20, "prio": 2},
-            {"name": "Hemd", "min_temp": 5, "max_temp": 25, "prio": 4},
-            {"name": "T-Shirt", "min_temp": 10, "max_temp": 40, "prio": 3}
+            {"name": "Pullover", "min_temp": -20, "max_temp": 18, "prio": 1, "weather": "any"},
+            {"name": "Sweatshirt", "min_temp": -10, "max_temp": 20, "prio": 2, "weather": "any"},
+            {"name": "Hemd", "min_temp": 5, "max_temp": 25, "prio": 4, "weather": "any"},
+            {"name": "T-Shirt", "min_temp": 10, "max_temp": 40, "prio": 3, "weather": "sunny"}
         ],
         "Hosen": [
-            {"name": "Jeans", "min_temp": -20, "max_temp": 25, "prio": 1},
-            {"name": "Jogginghose", "min_temp": -5, "max_temp": 20, "prio": 4},
-            {"name": "Shorts", "min_temp": 18, "max_temp": 40, "prio": 3}
+            {"name": "Jeans", "min_temp": -20, "max_temp": 25, "prio": 1, "weather": "any"},
+            {"name": "Jogginghose", "min_temp": -5, "max_temp": 20, "prio": 4, "weather": "cloudy"},
+            {"name": "Shorts", "min_temp": 18, "max_temp": 40, "prio": 3, "weather": "sunny"}
         ],
         "Jacken": [
-            {"name": "Jacke", "min_temp": -20, "max_temp": 15, "prio": 1},
-            {"name": "Mantel", "min_temp": -20, "max_temp": 10, "prio": 2},
-            {"name": "Regenjacke", "min_temp": 0, "max_temp": 20, "prio": 3}
+            {"name": "Jacke", "min_temp": -20, "max_temp": 15, "prio": 1, "weather": "cloudy"},
+            {"name": "Mantel", "min_temp": -20, "max_temp": 10, "prio": 2, "weather": "cloudy"},
+            {"name": "Regenjacke", "min_temp": 0, "max_temp": 20, "prio": 3, "weather": "rain"}
         ],
         "Schuhe": [
-            {"name": "Stiefel", "min_temp": -20, "max_temp": 10, "prio": 1},
-            {"name": "Sneaker", "min_temp": 5, "max_temp": 30, "prio": 2}
+            {"name": "Stiefel", "min_temp": -20, "max_temp": 10, "prio": 1, "weather": "snow"},
+            {"name": "Sneaker", "min_temp": 5, "max_temp": 30, "prio": 2, "weather": "any"}
         ],
         "Accessoires": [
-            {"name": "Mütze", "min_temp": -20, "max_temp": 8, "prio": 2},
-            {"name": "Schal", "min_temp": -20, "max_temp": 10, "prio": 2}
+            {"name": "Mütze", "min_temp": -20, "max_temp": 8, "prio": 2, "weather": "snow"},
+            {"name": "Schal", "min_temp": -20, "max_temp": 10, "prio": 2, "weather": "snow"}
         ]
     }
 
@@ -46,28 +46,28 @@ def get_default_wardrobe_de():
 def get_default_wardrobe_en():
     return {
         "Tops": [
-            {"name": "Sweater", "min_temp": -20, "max_temp": 18, "prio": 1},
-            {"name": "Hoodie", "min_temp": -10, "max_temp": 20, "prio": 2},
-            {"name": "Shirt", "min_temp": 5, "max_temp": 25, "prio": 4},
-            {"name": "T-shirt", "min_temp": 10, "max_temp": 40, "prio": 3}
+            {"name": "Sweater", "min_temp": -20, "max_temp": 18, "prio": 1, "weather": "any"},
+            {"name": "Hoodie", "min_temp": -10, "max_temp": 20, "prio": 2, "weather": "any"},
+            {"name": "Shirt", "min_temp": 5, "max_temp": 25, "prio": 4, "weather": "any"},
+            {"name": "T-shirt", "min_temp": 10, "max_temp": 40, "prio": 3, "weather": "sunny"}
         ],
         "Pants": [
-            {"name": "Jeans", "min_temp": -20, "max_temp": 25, "prio": 1},
-            {"name": "Sweatpants", "min_temp": -5, "max_temp": 20, "prio": 4},
-            {"name": "Shorts", "min_temp": 18, "max_temp": 40, "prio": 3}
+            {"name": "Jeans", "min_temp": -20, "max_temp": 25, "prio": 1, "weather": "any"},
+            {"name": "Sweatpants", "min_temp": -5, "max_temp": 20, "prio": 4, "weather": "cloudy"},
+            {"name": "Shorts", "min_temp": 18, "max_temp": 40, "prio": 3, "weather": "sunny"}
         ],
         "Jackets": [
-            {"name": "Jacket", "min_temp": -20, "max_temp": 15, "prio": 1},
-            {"name": "Coat", "min_temp": -20, "max_temp": 10, "prio": 2},
-            {"name": "Rain jacket", "min_temp": 0, "max_temp": 20, "prio": 3}
+            {"name": "Jacket", "min_temp": -20, "max_temp": 15, "prio": 1, "weather": "cloudy"},
+            {"name": "Coat", "min_temp": -20, "max_temp": 10, "prio": 2, "weather": "cloudy"},
+            {"name": "Rain jacket", "min_temp": 0, "max_temp": 20, "prio": 3, "weather": "rain"}
         ],
         "Shoes": [
-            {"name": "Boots", "min_temp": -20, "max_temp": 10, "prio": 1},
-            {"name": "Sneakers", "min_temp": 5, "max_temp": 30, "prio": 2}
+            {"name": "Boots", "min_temp": -20, "max_temp": 10, "prio": 1, "weather": "snow"},
+            {"name": "Sneakers", "min_temp": 5, "max_temp": 30, "prio": 2, "weather": "any"}
         ],
         "Accessories": [
-            {"name": "Beanie", "min_temp": -20, "max_temp": 8, "prio": 2},
-            {"name": "Scarf", "min_temp": -20, "max_temp": 10, "prio": 2}
+            {"name": "Beanie", "min_temp": -20, "max_temp": 8, "prio": 2, "weather": "snow"},
+            {"name": "Scarf", "min_temp": -20, "max_temp": 10, "prio": 2, "weather": "snow"}
         ]
     }
 
@@ -139,7 +139,7 @@ Returns:
     True if the item was added, False if it already exists.
 """
 
-def add_clothing(chat_id, category, item, fuzzy_threshold=90):
+def add_clothing(chat_id, category, item, fuzzy_threshold=90, min_temp=10, max_temp=25, prio=3, weather="any"):
     if not category:
         return False, None  # Category is required
     data, user_wardrobe = get_or_create_user_wardrobe(chat_id)
@@ -156,7 +156,7 @@ def add_clothing(chat_id, category, item, fuzzy_threshold=90):
                 return False, name  # Already exists (fuzzy match)
     # Add as dict if default wardrobe uses dicts
     if existing_items and isinstance(existing_items[0], dict):
-        user_wardrobe.setdefault(category, []).append({"name": item, "min_temp": 10, "max_temp": 25, "prio": 3})
+        user_wardrobe.setdefault(category, []).append({"name": item, "min_temp": min_temp, "max_temp": max_temp, "prio": prio, "weather": weather})
     else:
         user_wardrobe.setdefault(category, []).append(item)
     data[str(chat_id)] = [user_wardrobe]

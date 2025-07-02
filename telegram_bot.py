@@ -276,7 +276,7 @@ bot.set_my_commands([
     telebot.types.BotCommand("start", "Greetings"),
     telebot.types.BotCommand("routines", "Set Routine"),
     telebot.types.BotCommand("delete_routine", "Delete a Routine"),
-    telebot.types.BotCommand("Kleiderschrank", "Bearbeiten des Kleiderschranks"),
+    telebot.types.BotCommand("kleiderschrank", "Bearbeiten des Kleiderschranks"),
     telebot.types.BotCommand("wardrobe", "Manage your wardrobe")
 ])
 
