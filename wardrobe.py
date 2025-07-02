@@ -213,7 +213,7 @@ def handle_wardrobe(bot, message, text, language):
     item = parsed["item"]
     print(f"Intent: {intent}, Category: {category}, Item: {item}")
 
-    # Message templates for English and German (comments in English only)
+    # Message templates for English and German
     if language.lower().startswith("de"):
         msg_no_item = f"Du hast {item} nicht."
         msg_suggest = "Wie wäre es stattdessen mit: {alts}?"
@@ -235,8 +235,24 @@ def handle_wardrobe(bot, message, text, language):
         msg_not_in_cat = f"{item} was not found in your {category}."
         msg_wardrobe = "Your wardrobe contains:\n"
 
-    # Handle the case where the user does not have a suggested item
-    if intent == "missing" and item:
+    # Full decision structure for all intents
+    if intent == "add":
+        if not category or not item:
+            return msg_not_found
+        added = add_clothing(chat_id, category, item)
+        if added:
+            return msg_added
+        else:
+            return msg_already
+    elif intent == "remove":
+        if not category or not item:
+            return msg_not_in_cat
+        removed = remove_clothing(chat_id, category, item)
+        if removed:
+            return msg_removed
+        else:
+            return msg_not_in_cat
+    elif intent == "missing":
         if not category:
             _, user_wardrobe = get_or_create_user_wardrobe(chat_id)
             for cat, items in user_wardrobe.items():
@@ -247,32 +263,16 @@ def handle_wardrobe(bot, message, text, language):
             remove_clothing(chat_id, category, item)
             alternatives = suggest_alternative(chat_id, category, item)
             if alternatives:
-                alternatives_str = ", ".join(alternatives)
-                reply = f"{msg_no_item} {msg_suggest.format(alts=alternatives_str)}"
-                bot.reply_to(message, reply)
+                return msg_suggest.format(alts=", ".join(alternatives))
             else:
-                bot.reply_to(message, msg_no_alts)
+                return msg_no_alts
         else:
-            bot.reply_to(message, msg_not_found)
-
-    # Handle the case where the user wants to add a new item
-    elif intent == "add" and category and item:
-        if add_clothing(chat_id, category, item):
-            bot.reply_to(message, msg_added)
-        else:
-            bot.reply_to(message, msg_already)
-
-    # Handle the case where the user wants to remove an item
-    elif intent == "remove" and category and item:
-        if remove_clothing(chat_id, category, item):
-            bot.reply_to(message, msg_removed)
-        else:
-            bot.reply_to(message, msg_not_in_cat)
-
-    # Show the current wardrobe if no specific action is detected
-    else:
+            return msg_no_item
+    elif intent == "show":
         _, user_wardrobe = get_or_create_user_wardrobe(chat_id)
-        response = msg_wardrobe
+        lines = []
         for cat, items in user_wardrobe.items():
-            response += f"{cat}: {', '.join(items)}\n"
-        bot.reply_to(message, response)
+            lines.append(f"{cat}: {', '.join(items)}")
+        return msg_wardrobe + "\n".join(lines)
+    else:
+        return f"Wardrobe-Feature: Anfrage erhalten. (Intent: {intent}, Kategorie: {category}, Item: {item})"

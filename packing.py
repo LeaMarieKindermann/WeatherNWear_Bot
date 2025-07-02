@@ -14,15 +14,17 @@ import os
 
 def handle_packing(bot, message, text, language):
     """
-    Handle the packing command.
-    This function is called when the intend of the user is found to be packing.
-    It sends a message providing the forecast at the destination & date AND 
-    provides a travel packing list.
-    
-    -----
-    
+    Handles the packing command. This function is called when the intent of the user is packing.
+    It should return a packing list and weather forecast for the destination and date.
+
     Args:
         bot: The telebot instance.
         message: The message object containing user input.
+        text (str): The user's message text.
+        language (str): The detected language code ('de' or 'en').
+    Returns:
+        str: The packing list or a placeholder message.
     """
-    bot.reply_to(message, "What to Pack? Feature is coming soon.\n")
+    print(f"handle_packing called with text: {text}, language: {language}")
+    # TODO: Implement packing logic here in the future
+    return "What to Pack? Feature is coming soon."

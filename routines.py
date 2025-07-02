@@ -233,8 +233,7 @@ def handle_routine(bot, message, text, language):
                 "de": "Du hast aktuell keine Routinen gespeichert.",
                 "en": "You don't have any saved routines yet."
             }.get(language, "No routines found.")
-            bot.reply_to(message, msg)
-            return
+            return msg
 
         lines = []
         for i, r in enumerate(routines, 1):
@@ -245,8 +244,7 @@ def handle_routine(bot, message, text, language):
             "en": "🗓️ Your saved routines:\n\n" + "\n".join(lines) + "\n\nTo delete: /routine_löschen <number>"
         }.get(language, "\n".join(lines))
 
-        bot.reply_to(message, msg)
-        return
+        return msg
 
     # 📌 Command: /routine_löschen <nummer>
     if text_lower.startswith("/delete_routine"):
@@ -254,8 +252,7 @@ def handle_routine(bot, message, text, language):
         routines = user_info.get(chat_id, [])
 
         if len(parts) != 2 or not parts[1].isdigit():
-            bot.reply_to(message, "Bitte gib die Nummer der Routine an. Beispiel: /routine_löschen 1" if language == "de" else "Please provide the routine number, e.g., /routine_löschen 1")
-            return
+            return "Bitte gib die Nummer der Routine an. Beispiel: /routine_löschen 1" if language == "de" else "Please provide the routine number, e.g., /routine_löschen 1"
 
         index = int(parts[1]) - 1
 
@@ -267,10 +264,9 @@ def handle_routine(bot, message, text, language):
             if scheduler.get_job(job_id):
                 scheduler.remove_job(job_id)
 
-            bot.reply_to(message, f"Routine {index+1} gelöscht." if language == "de" else f"Routine {index+1} deleted.")
+            return f"Routine {index+1} gelöscht." if language == "de" else f"Routine {index+1} deleted."
         else:
-            bot.reply_to(message, "Ungültige Routinenummer." if language == "de" else "Invalid routine number.")
-        return
+            return "Ungültige Routinenummer." if language == "de" else "Invalid routine number."
 
     # ⏰ Standard: Routine erstellen (bestehender Code)
     city, hour, minute = extract_routine_details(text, language)
@@ -289,8 +285,7 @@ def handle_routine(bot, message, text, language):
     t = responses.get(language, responses["en"])
 
     if not city or hour is None:
-        bot.reply_to(message, t["missing_info"])
-        return
+        return t["missing_info"]
 
     routine = {
         "city": city,
@@ -305,4 +300,4 @@ def handle_routine(bot, message, text, language):
     schedule_daily_message(bot, int(chat_id), city, hour, minute, language)
 
     time_str = f"{hour:02d}:{minute:02d}"
-    bot.reply_to(message, t["confirmed"].format(time=time_str, city=city))
+    return t["confirmed"].format(time=time_str, city=city)

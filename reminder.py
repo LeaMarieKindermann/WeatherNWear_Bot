@@ -324,31 +324,31 @@ Args:
     language: The language of the message.
 """
 def handle_reminder(bot, message, text, language):
+    print(f"handle_reminder called with text: {text}, language: {language}")
     time_str, what = extract_reminder_info(text, language)
     print(f"Extracted time: {time_str}, what: {what}")
     if not what or what.strip() == "":
         if language == "de":
-            bot.reply_to(message, "Bitte gib an, woran ich dich erinnern soll.")
+            return "Bitte gib an, woran ich dich erinnern soll."
         else:
-            bot.reply_to(message, "Please specify what I should remind you about.")
-        return
+            return "Please specify what I should remind you about."
     if time_str:
         errorcode = save_reminder(message.chat.id, time_str, what, language)
         if errorcode == 1:
             if language == "de":
-                bot.reply_to(message, "Die Uhrzeit ist nicht im richtigen Format. Bitte versuche es erneut.")
+                return "Die Uhrzeit ist nicht im richtigen Format. Bitte versuche es erneut."
             else:
-                bot.reply_to(message, "The time is not in the correct format. Please try again.")
+                return "The time is not in the correct format. Please try again."
         else:
             if language == "de":
-                bot.reply_to(message, f"Okay, ich werde dich {format_reminder_time(time_str, language)} daran erinnern, {what}")
+                return f"Okay, ich werde dich {format_reminder_time(time_str, language)} daran erinnern, {what}"
             else:
-                bot.reply_to(message, f"Okay, I will remind you {format_reminder_time(time_str, language)} to {what}")
+                return f"Okay, I will remind you {format_reminder_time(time_str, language)} to {what}"
     else:
         if language == "de":
-            bot.reply_to(message, "Bitte gib eine Uhrzeit an, wann ich dich erinnern soll.")
+            return "Bitte gib eine Uhrzeit an, wann ich dich erinnern soll."
         else:
-            bot.reply_to(message, "Please specify a time when I should remind you.")
+            return "Please specify a time when I should remind you."
 
 """
 Check reminders periodically and send notifications.

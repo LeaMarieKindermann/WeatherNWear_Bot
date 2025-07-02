@@ -1,5 +1,6 @@
 # Modules to import
 import telebot
+import os
 
 # Custom modules to import
 from wnw_bot_api_token import token as api_token
@@ -12,6 +13,8 @@ import requests
 
 import speech_to_text
 import intent_detection
+import text_to_speech
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # For asynchronous operations
 import threading
@@ -24,6 +27,15 @@ def send_welcome(message):
     first_name = message.from_user.first_name if message.from_user.first_name else ""
     last_name = message.from_user.last_name if message.from_user.last_name else ""
     bot.reply_to(message, f"Welcome, {first_name} {last_name}!")
+
+def send_reply_with_tts_button(message, reply_text, lang):
+    """
+    Sendet eine Antwort mit Inline-Button zum Vorlesen.
+    """
+    keyboard = InlineKeyboardMarkup()
+    button = InlineKeyboardButton("🔊 Vorlesen", callback_data=f"tts|{lang}")
+    keyboard.add(button)
+    bot.send_message(message.chat.id, reply_text, reply_markup=keyboard)
 
 # Basic messge handler
 @bot.message_handler(commands=['start'])
@@ -51,25 +63,40 @@ def handle_text(message):
     language = speech_to_text.detect_language(text)
     intent = intent_detection.detect_intent(text, language)
     print("Intent: " + intent)
+    response = None
     if intent == "packing":
-        packing.handle_packing(bot, message, text, language)
+        response = packing.handle_packing(bot, message, text, language)
     elif intent == "routine":
-        routines.handle_routine(bot, message, text, language)
+        response = routines.handle_routine(bot, message, text, language)
     elif intent == "routine_list":
-        routines.handle_routine(bot, message, "/routines", language)
+        response = routines.handle_routine(bot, message, "/routines", language)
     elif intent == "routine_delete":
-        routines.handle_routine(bot, message, "/delete_routine", language)
+        response = routines.handle_routine(bot, message, "/delete_routine", language)
     elif intent == "wardrobe":
-        wardrobe.handle_wardrobe(bot, message, text, language)
+        response = wardrobe.handle_wardrobe(bot, message, text, language)
     elif intent == "reminder":
-        reminder.handle_reminder(bot, message, text, language)
+        response = reminder.handle_reminder(bot, message, text, language)
     elif intent == "weather":
-        weather.handle_weather(bot, message, text, language)
+        response = weather.handle_weather(bot, message, text, language)
     else:
         if language == "de":
-            bot.reply_to(message, "Es tut mir leid, ich habe dich nicht verstanden. Bitte versuche es erneut.")
+            response = "Es tut mir leid, ich habe dich nicht verstanden. Bitte versuche es erneut."
         elif language == "en":
-            bot.reply_to(message, "Sorry, I didn't understand. Please try again.")
+            response = "Sorry, I didn't understand. Please try again."
+    if response:
+        send_reply_with_tts_button(message, response, language)
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("tts|"))
+def handle_tts_callback(call):
+    lang = call.data.split("|", 1)[1]
+    # Hole die letzte Bot-Nachricht im Chat (optional: oder speichere Text im Callback)
+    # Hier nehmen wir an, dass der Callback auf die letzte Bot-Nachricht folgt
+    reply_text = call.message.text
+    ogg_path = text_to_speech.text_to_speech(reply_text, lang=lang)
+    with open(ogg_path, "rb") as audio:
+        bot.send_voice(call.message.chat.id, audio)
+    os.remove(ogg_path)
+    bot.answer_callback_query(call.id)
 
 def get_location_from_coordinates(latitude, longitude):
     """
@@ -110,7 +137,9 @@ def handle_location_or_venue(message):
         longitude = message.location.longitude
 
     location = get_location_from_coordinates(latitude, longitude)
-    weather.handle_weather_location(bot, message, location)
+    response = weather.handle_weather_location(bot, message, location)
+    # Standardmäßig Deutsch für Standortantworten
+    send_reply_with_tts_button(message, response, "de")
 
 # Function to handle voice messages
 @bot.message_handler(content_types=['voice'])
@@ -119,33 +148,23 @@ def handle_voice(message):
     
     if text:
         print(f"Input: {text}, Language: {language}")
-        match language:
-            case "de":
-                intent = intent_detection.detect_intent(text, language)
-                # Optional: bot.reply_to(message, f"You said: {text}")
-                if intent == "packing":
-                    packing.handle_packing(bot, message, text, language)
-                elif intent == "routine":
-                    routines.handle_routine(bot, message, text, language)
-                elif intent == "wardrobe":
-                    wardrobe.handle_wardrobe(bot, message, text, language)
-                elif intent == "reminder":
-                    reminder.handle_reminder(bot, message, text, language)
-                else:
-                    bot.reply_to(message, f"Es tut mir leid, ich habe dich nicht verstanden. Ich habe nur verstanden: {text}.")
-            case "en":
-                intent = intent_detection.detect_intent(text, language)
-                # Optional: bot.reply_to(message, f"You said: {text}")
-                if intent == "packing":
-                    packing.handle_packing(bot, message, text, language)
-                elif intent == "routine":
-                    routines.handle_routine(bot, message, text, language)
-                elif intent == "wardrobe":
-                    wardrobe.handle_wardrobe(bot, message, text, language)
-                elif intent == "reminder":
-                    reminder.handle_reminder(bot, message, text, language)
-                else:
-                    bot.reply_to(message, f"Sorry, I didn't understand your intent, I understood {text}.")
+        intent = intent_detection.detect_intent(text, language)
+        response = None
+        if intent == "packing":
+            response = packing.handle_packing(bot, message, text, language)
+        elif intent == "routine":
+            response = routines.handle_routine(bot, message, text, language)
+        elif intent == "wardrobe":
+            response = wardrobe.handle_wardrobe(bot, message, text, language)
+        elif intent == "reminder":
+            response = reminder.handle_reminder(bot, message, text, language)
+        else:
+            if language == "de":
+                response = f"Es tut mir leid, ich habe dich nicht verstanden. Ich habe nur verstanden: {text}."
+            else:
+                response = f"Sorry, I didn't understand your intent, I understood {text}."
+        if response:
+            send_reply_with_tts_button(message, response, language)
     else:
         bot.reply_to(message, "Sorry, I couldn't understand your voice message.")
 

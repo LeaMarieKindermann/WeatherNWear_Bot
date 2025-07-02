@@ -158,22 +158,19 @@ def handle_weather(bot, message, text, language):
             text (str): The user's message text
             language (str): The detected language code ('de' or 'en')
     """
+    print(f"handle_weather called with text: {text}, language: {language}")
     location = extract_location(text, language)
     forecast_day = extract_forecast_day(text, language)
-
     if not location:
-        bot.reply_to(message, {
-            "de": "❌ Ich konnte keinen Ort erkennen. Bitte versuche es erneut.",
-            "en": "❌ I couldn't detect a location. Please try again."
-        }.get(language, "❌ Could not detect location."))
-        return
-
+        if language == "de":
+            return "❌ I could not detect a location. Please try again."
+        else:
+            return "❌ I couldn't detect a location. Please try again."
     weather = get_weather(location, language, forecast_day)
-
     if weather:
-        bot.reply_to(message, weather['text'])
+        return weather['text']
     else:
-        bot.reply_to(message, f"⚠️ Wetterdaten für '{location}' konnten nicht geladen werden.")
+        return f"⚠️ Weather data for '{location}' could not be loaded."
 
 def handle_weather_location(bot, message, location):
     forecast_texts = []
@@ -195,4 +192,4 @@ def handle_weather_location(bot, message, location):
     outro = "\n\n❗ Hinweis: Wetterdaten können sich kurzfristig ändern."
     full_forecast = intro + "\n\n".join(forecast_texts) + outro
 
-    bot.reply_to(message, full_forecast)
+    return full_forecast
