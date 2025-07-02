@@ -47,22 +47,124 @@ def handle_command(message):
           f"({message.from_user.first_name} {message.from_user.last_name}), " +
           f"text: {message.text}"
           )
-    
     # Call the function to send a welcome message
     if message.text == "/start":
         send_welcome(message)        
         wardrobe.get_or_create_user_wardrobe(message.chat.id)
         # get the user's Telegram interface language
         user_lang = getattr(message.from_user, "language_code", None)
+        # Create wardrobe for the user in the correct language
+        wardrobe.get_or_create_user_wardrobe(message.chat.id, user_lang)
         print(f"User Telegram language_code: {user_lang}")
 
+# Handler for /kleiderschrank, /Kleiderschrank, /wardrobe, /Wardrobe
+@bot.message_handler(commands=["kleiderschrank", "Kleiderschrank", "wardrobe", "Wardrobe"])
+def handle_wardrobe_menu(message):
+    language = getattr(message.from_user, "language_code", "de")
+    keyboard = InlineKeyboardMarkup()
+    if language.startswith("de"):
+        keyboard.add(InlineKeyboardButton("Anzeigen", callback_data="wardrobe_show"))
+        keyboard.add(InlineKeyboardButton("Hinzufügen", callback_data="wardrobe_add"))
+        keyboard.add(InlineKeyboardButton("Löschen", callback_data="wardrobe_remove"))
+        bot.send_message(message.chat.id, "Was willst du tun?", reply_markup=keyboard)
+    else:
+        keyboard.add(InlineKeyboardButton("Show", callback_data="wardrobe_show"))
+        keyboard.add(InlineKeyboardButton("Add", callback_data="wardrobe_add"))
+        keyboard.add(InlineKeyboardButton("Remove", callback_data="wardrobe_remove"))
+        bot.send_message(message.chat.id, "What do you want to do?", reply_markup=keyboard)
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("wardrobe_cat_add|"))
+def handle_wardrobe_cat_add(call):
+    # callback_data: wardrobe_cat_add|category|item|language
+    _, category, item, language = call.data.split("|", 3)
+    chat_id = call.message.chat.id
+    added, match_name = wardrobe.add_clothing(chat_id, category, item, fuzzy_threshold=100)
+    # Remove the inline keyboard so the user can't click again
+    try:
+        bot.edit_message_reply_markup(chat_id=chat_id, message_id=call.message.message_id, reply_markup=None)
+    except Exception:
+        pass  # Ignore if already edited or not possible
+    if added:
+        response = f"{item} wurde zu {category} hinzugefügt." if language.startswith("de") else f"{item} was added to {category}."
+        bot.send_message(chat_id, response)
+        bot.answer_callback_query(call.id)
+    else:
+        response = f"{match_name} ist bereits in deiner Kategorie {category}." if language.startswith("de") else f"{match_name} is already in your {category}."
+        bot.send_message(chat_id, response)
+        bot.answer_callback_query(call.id, text=response, show_alert=True)
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("wardrobe_"))
+def handle_wardrobe_action(call):
+    action = call.data.split("_")[1]
+    language = getattr(call.from_user, "language_code", "de")
+    chat_id = call.message.chat.id
+    if action == "show":
+        response = wardrobe.handle_wardrobe(bot, call.message, "zeige meinen Kleiderschrank", language)
+        bot.send_message(chat_id, response)
+        bot.answer_callback_query(call.id)
+        return
+    elif action == "add":
+        # Start add dialog: ask for item, then ask for category, then add
+        def ask_item(msg):
+            item = msg.text.strip()
+            if not item:
+                response = "No clothing item recognized." if not language.startswith("de") else "Kein Kleidungsstück erkannt."
+                bot.send_message(msg.chat.id, response)
+                return
+            user_wardrobe = wardrobe.get_or_create_user_wardrobe(msg.chat.id)[1]
+            cat, name = wardrobe.find_item_in_wardrobe(user_wardrobe, item)
+            if cat:
+                response = f"{item} ist bereits in deiner Kategorie {cat}." if language.startswith("de") else f"{item} is already in your {cat}."
+                bot.send_message(msg.chat.id, response)
+                return
+            # Ask for category
+            default_wardrobe = wardrobe.get_default_wardrobe(language)
+            keyboard = InlineKeyboardMarkup()
+            for cat in default_wardrobe.keys():
+                keyboard.add(InlineKeyboardButton(cat, callback_data=f"wardrobe_cat_add|{cat}|{item}|{language}"))
+            if language.startswith("de"):
+                prompt = f"In welche Kategorie soll '{item}'?"
+            else:
+                prompt = f"Which category for '{item}'?"
+            bot.send_message(msg.chat.id, prompt, reply_markup=keyboard)
+        if language.startswith("de"):
+            prompt = "Welches Kleidungsstück möchtest du hinzufügen?"
+        else:
+            prompt = "Which clothing item do you want to add?"
+        msg = bot.send_message(call.message.chat.id, prompt)
+        bot.register_next_step_handler(msg, ask_item)
+        bot.answer_callback_query(call.id)
+        return
+    elif action == "remove":
+        # Start remove dialog: ask for item, then remove from all categories
+        def ask_item(msg):
+            item = msg.text.strip()
+            if not item:
+                response = "No clothing item recognized." if not language.startswith("de") else "Kein Kleidungsstück erkannt."
+                bot.send_message(msg.chat.id, response)
+                return
+            found, found_cat = wardrobe.remove_item_from_all_categories(msg.chat.id, item)
+            if found:
+                response = f"{item} wurde aus {found_cat} entfernt." if language.startswith("de") else f"{item} was removed from {found_cat}."
+            else:
+                response = f"{item} wurde nicht gefunden." if language.startswith("de") else f"{item} was not found."
+            bot.send_message(msg.chat.id, response)
+        if language.startswith("de"):
+            prompt = "Welches Kleidungsstück möchtest du löschen?"
+        else:
+            prompt = "Which clothing item do you want to remove?"
+        msg = bot.send_message(call.message.chat.id, prompt)
+        bot.register_next_step_handler(msg, ask_item)
+        bot.answer_callback_query(call.id)
+        return
+    
 # Function to interpret the user's intent if it is not a command
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
     text = message.text
     language = speech_to_text.detect_language(text)
     intent = intent_detection.detect_intent(text, language)
-    print("Intent: " + intent)
+    print("Intent: " + str(intent))
     response = None
     if intent == "packing":
         response = packing.handle_packing(bot, message, text, language)
@@ -173,7 +275,9 @@ def handle_voice(message):
 bot.set_my_commands([
     telebot.types.BotCommand("start", "Greetings"),
     telebot.types.BotCommand("routines", "Set Routine"),
-    telebot.types.BotCommand("delete_routine", "Delete a Routine")
+    telebot.types.BotCommand("delete_routine", "Delete a Routine"),
+    telebot.types.BotCommand("Kleiderschrank", "Bearbeiten des Kleiderschranks"),
+    telebot.types.BotCommand("wardrobe", "Manage your wardrobe")
 ])
 
 # Start the check_reminders thread

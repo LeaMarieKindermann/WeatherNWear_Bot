@@ -1,6 +1,7 @@
 import os
 import json
 import spacy
+from rapidfuzz import fuzz
 
 # Load both spaCy models for NLP (German and English supported)
 nlp_de = spacy.load("de_core_news_sm")  # python -m spacy download de_core_news_sm to install the German model
@@ -8,14 +9,74 @@ nlp_en = spacy.load("en_core_web_sm")   # python -m spacy download en_core_web_s
 
 WARDROBE_PATH = "wardrobe.json"
 
-# Default wardrobe (gender-neutral)
-DEFAULT_WARDROBE = {
-    "Oberteile": ["T-Shirt", "Pullover", "Hemd", "Sweatshirt"],
-    "Hosen": ["Jeans", "Jogginghose", "Shorts"],
-    "Jacken": ["Jacke", "Mantel", "Regenjacke"],
-    "Schuhe": ["Sneaker", "Stiefel"],
-    "Accessoires": ["Mütze", "Schal"]
-}
+# Default wardrobe for German users
+# Priority scale is 1 (highest) to 5 (lowest)
+
+def get_default_wardrobe_de():
+    return {
+        "Oberteile": [
+            {"name": "Pullover", "min_temp": -20, "max_temp": 18, "prio": 1},
+            {"name": "Sweatshirt", "min_temp": -10, "max_temp": 20, "prio": 2},
+            {"name": "Hemd", "min_temp": 5, "max_temp": 25, "prio": 4},
+            {"name": "T-Shirt", "min_temp": 10, "max_temp": 40, "prio": 3}
+        ],
+        "Hosen": [
+            {"name": "Jeans", "min_temp": -20, "max_temp": 25, "prio": 1},
+            {"name": "Jogginghose", "min_temp": -5, "max_temp": 20, "prio": 4},
+            {"name": "Shorts", "min_temp": 18, "max_temp": 40, "prio": 3}
+        ],
+        "Jacken": [
+            {"name": "Jacke", "min_temp": -20, "max_temp": 15, "prio": 1},
+            {"name": "Mantel", "min_temp": -20, "max_temp": 10, "prio": 2},
+            {"name": "Regenjacke", "min_temp": 0, "max_temp": 20, "prio": 3}
+        ],
+        "Schuhe": [
+            {"name": "Stiefel", "min_temp": -20, "max_temp": 10, "prio": 1},
+            {"name": "Sneaker", "min_temp": 5, "max_temp": 30, "prio": 2}
+        ],
+        "Accessoires": [
+            {"name": "Mütze", "min_temp": -20, "max_temp": 8, "prio": 2},
+            {"name": "Schal", "min_temp": -20, "max_temp": 10, "prio": 2}
+        ]
+    }
+
+# Default wardrobe for English users
+# Priority scale is 1 (highest) to 5 (lowest)
+
+def get_default_wardrobe_en():
+    return {
+        "Tops": [
+            {"name": "Sweater", "min_temp": -20, "max_temp": 18, "prio": 1},
+            {"name": "Hoodie", "min_temp": -10, "max_temp": 20, "prio": 2},
+            {"name": "Shirt", "min_temp": 5, "max_temp": 25, "prio": 4},
+            {"name": "T-shirt", "min_temp": 10, "max_temp": 40, "prio": 3}
+        ],
+        "Pants": [
+            {"name": "Jeans", "min_temp": -20, "max_temp": 25, "prio": 1},
+            {"name": "Sweatpants", "min_temp": -5, "max_temp": 20, "prio": 4},
+            {"name": "Shorts", "min_temp": 18, "max_temp": 40, "prio": 3}
+        ],
+        "Jackets": [
+            {"name": "Jacket", "min_temp": -20, "max_temp": 15, "prio": 1},
+            {"name": "Coat", "min_temp": -20, "max_temp": 10, "prio": 2},
+            {"name": "Rain jacket", "min_temp": 0, "max_temp": 20, "prio": 3}
+        ],
+        "Shoes": [
+            {"name": "Boots", "min_temp": -20, "max_temp": 10, "prio": 1},
+            {"name": "Sneakers", "min_temp": 5, "max_temp": 30, "prio": 2}
+        ],
+        "Accessories": [
+            {"name": "Beanie", "min_temp": -20, "max_temp": 8, "prio": 2},
+            {"name": "Scarf", "min_temp": -20, "max_temp": 10, "prio": 2}
+        ]
+    }
+
+# Returns the default wardrobe for the given language ("de" or "en")
+def get_default_wardrobe(language="de"):
+    if language.lower().startswith("en"):
+        return get_default_wardrobe_en()
+    else:
+        return get_default_wardrobe_de()
 
 """
 Load the wardrobe.json file or create it if it does not exist.
@@ -26,7 +87,13 @@ def load_wardrobe():
         with open(WARDROBE_PATH, "w", encoding="utf-8") as f:
             json.dump({}, f)
     with open(WARDROBE_PATH, "r", encoding="utf-8") as f:
-        return json.load(f)
+        content = f.read().strip()
+        if not content:
+            return {}
+        try:
+            return json.loads(content)
+        except json.JSONDecodeError:
+            return {}
 
 """
 Save the wardrobe data to wardrobe.json.
@@ -50,12 +117,12 @@ Returns the wardrobe data for all users and the user's wardrobe (dict).
 Args:
     chat_id: The chat id of the user.
 """
-def get_or_create_user_wardrobe(chat_id):
+def get_or_create_user_wardrobe(chat_id, language="de"):
     data = load_wardrobe()
     chat_id_str = str(chat_id)
     # Create a new wardrobe for the user if not present
     if chat_id_str not in data:
-        data[chat_id_str] = [DEFAULT_WARDROBE.copy()]
+        data[chat_id_str] = [get_default_wardrobe(language)]
         save_wardrobe(data)
     return data, data[chat_id_str][0]
 
@@ -71,15 +138,30 @@ Args:
 Returns:
     True if the item was added, False if it already exists.
 """
-def add_clothing(chat_id, category, item):
-    data, user_wardrobe = get_or_create_user_wardrobe(chat_id)
-    if item not in user_wardrobe.get(category, []):
-        user_wardrobe.setdefault(category, []).append(item)
-        data[str(chat_id)] = [user_wardrobe]
-        save_wardrobe(data)
-        return True
-    return False
 
+def add_clothing(chat_id, category, item, fuzzy_threshold=90):
+    if not category:
+        return False, None  # Category is required
+    data, user_wardrobe = get_or_create_user_wardrobe(chat_id)
+    existing_items = user_wardrobe.get(category, [])
+    for i in existing_items:
+        name = i["name"] if isinstance(i, dict) else i
+        if fuzzy_threshold >= 100:
+            # Exact match (case-insensitive)
+            if item.lower() == name.lower():
+                return False, name  # Already exists (exact match)
+        else:
+            score = fuzz.partial_ratio(item.lower(), name.lower())
+            if score >= fuzzy_threshold:
+                return False, name  # Already exists (fuzzy match)
+    # Add as dict if default wardrobe uses dicts
+    if existing_items and isinstance(existing_items[0], dict):
+        user_wardrobe.setdefault(category, []).append({"name": item, "min_temp": 10, "max_temp": 25, "prio": 3})
+    else:
+        user_wardrobe.setdefault(category, []).append(item)
+    data[str(chat_id)] = [user_wardrobe]
+    save_wardrobe(data)
+    return True, item
 
 """
 Remove a clothing item from the user's wardrobe.
@@ -93,14 +175,33 @@ Args:
 Returns:
     True if the item was removed, False if it was not found.
 """
-def remove_clothing(chat_id, category, item):
+def remove_clothing(chat_id, category, item, fuzzy_threshold=90):
+    if not category:
+        return False, None  # Category is required
     data, user_wardrobe = get_or_create_user_wardrobe(chat_id)
-    if item in user_wardrobe.get(category, []):
-        user_wardrobe[category].remove(item)
+    found = False
+    found_name = None
+    for i in user_wardrobe.get(category, [])[:]:
+        name = i["name"] if isinstance(i, dict) else i
+        if fuzzy_threshold >= 100:
+            # Exact match (case-insensitive)
+            if item.lower() == name.lower():
+                user_wardrobe[category].remove(i)
+                found = True
+                found_name = name
+                break
+        else:
+            score = fuzz.partial_ratio(item.lower(), name.lower())
+            if score >= fuzzy_threshold:
+                user_wardrobe[category].remove(i)
+                found = True
+                found_name = name
+                break
+    if found:
         data[str(chat_id)] = [user_wardrobe]
         save_wardrobe(data)
-        return True
-    return False
+        return True, found_name
+    return False, None
 
 """
 Suggest alternative clothing items from the same category.
@@ -138,6 +239,8 @@ def extract_intent_and_entities(text, language="de"):
         nlp = nlp_en
     doc = nlp(text)
     text_lower = text.lower()
+    # Get the current default wardrobe structure for categories and items
+    default_wardrobe = get_default_wardrobe(language)
     # Detect intent based on keywords
     if language.lower().startswith("de"):
         if any(kw in text_lower for kw in ["habe kein", "habe nicht", "besitze nicht"]):
@@ -158,34 +261,56 @@ def extract_intent_and_entities(text, language="de"):
         else:
             intent = "show"
 
-    # Try to extract item and category using noun chunks and known lists
+    # Fuzzy matching helpers
+    def fuzzy_find_best(query, choices, threshold=90):
+        best = None
+        best_score = threshold
+        for c in choices:
+            score = fuzz.partial_ratio(query, c.lower())
+            if score > best_score:
+                best = c
+                best_score = score
+        return best
+
+    # Try to extract item and category using fuzzy matching
     item = None
     category = None
-    for chunk in doc.noun_chunks:
-        for cat in DEFAULT_WARDROBE.keys():
-            if cat.lower() in chunk.text.lower():
+    # Fuzzy match for category
+    category = fuzzy_find_best(text_lower, [cat.lower() for cat in default_wardrobe.keys()])
+    if category:
+        for cat in default_wardrobe.keys():
+            if cat.lower() == category:
                 category = cat
-        # If not a category, maybe it's an item
-        if not category:
-            for items in DEFAULT_WARDROBE.values():
-                for i in items:
-                    if i.lower() in chunk.text.lower():
-                        item = i
-    # Fallback: look for known items/categories in the text
-    if not category:
-        for cat in DEFAULT_WARDROBE.keys():
-            if cat.lower() in text_lower:
-                category = cat
-    if not item:
-        for items in DEFAULT_WARDROBE.values():
+                break
+    # Fuzzy match for item
+    all_items = []
+    for items in default_wardrobe.values():
+        for i in items:
+            name = i["name"] if isinstance(i, dict) else i
+            all_items.append(name)
+    item = fuzzy_find_best(text_lower, [i.lower() for i in all_items])
+    if item:
+        for i in all_items:
+            if i.lower() == item:
+                item = i
+                break
+    # If category is still None but item is found, try to infer category by best fuzzy match of item in all categories
+    if not category and item:
+        best_cat = None
+        best_score = 85
+        for cat, items in default_wardrobe.items():
             for i in items:
-                if i.lower() in text_lower:
-                    item = i
+                name = i["name"] if isinstance(i, dict) else i
+                score = fuzz.partial_ratio(item.lower(), name.lower())
+                if score > best_score:
+                    best_cat = cat
+                    best_score = score
+        if best_cat:
+            category = best_cat
     # Try to extract new items (not in default) for add/remove
     if intent in ["add", "remove"] and not item:
-        # Assume the first noun not matching a category is the item
         for token in doc:
-            if token.pos_ == "NOUN" and token.text.lower() not in [c.lower() for c in DEFAULT_WARDROBE.keys()]:
+            if token.pos_ == "NOUN" and fuzzy_find_best(token.text.lower(), [c.lower() for c in default_wardrobe.keys()]) is None:
                 item = token.text
                 break
     return {"intent": intent, "category": category, "item": item}
@@ -239,19 +364,19 @@ def handle_wardrobe(bot, message, text, language):
     if intent == "add":
         if not category or not item:
             return msg_not_found
-        added = add_clothing(chat_id, category, item)
+        added, match_name = add_clothing(chat_id, category, item)
         if added:
             return msg_added
         else:
-            return msg_already
+            return f"{match_name} ist bereits in deiner Kategorie {category}." if language.lower().startswith("de") else f"{match_name} is already in your {category}."
     elif intent == "remove":
         if not category or not item:
             return msg_not_in_cat
-        removed = remove_clothing(chat_id, category, item)
+        removed, match_name = remove_clothing(chat_id, category, item)
         if removed:
-            return msg_removed
+            return msg_removed.replace(item, match_name)
         else:
-            return msg_not_in_cat
+            return f"{item} wurde nicht in deiner Kategorie {category} gefunden." if language.lower().startswith("de") else f"{item} was not found in your {category}."
     elif intent == "missing":
         if not category:
             _, user_wardrobe = get_or_create_user_wardrobe(chat_id)
@@ -272,7 +397,31 @@ def handle_wardrobe(bot, message, text, language):
         _, user_wardrobe = get_or_create_user_wardrobe(chat_id)
         lines = []
         for cat, items in user_wardrobe.items():
-            lines.append(f"{cat}: {', '.join(items)}")
+            lines.append(f"{cat}: {', '.join(i['name'] if isinstance(i, dict) else i for i in items)}")
         return msg_wardrobe + "\n".join(lines)
     else:
         return f"Wardrobe-Feature: Anfrage erhalten. (Intent: {intent}, Kategorie: {category}, Item: {item})"
+
+def find_item_in_wardrobe(user_wardrobe, item):
+    """
+    Returns (category, name) if item exists in any category, else (None, None).
+    """
+    for cat, items in user_wardrobe.items():
+        for i in items:
+            name = i["name"] if isinstance(i, dict) else i
+            if item.lower() == name.lower():
+                return cat, name
+    return None, None
+
+def remove_item_from_all_categories(chat_id, item):
+    """
+    Removes the item from all categories for the user. Returns (True, category) if found and removed, else (False, None).
+    """
+    data, user_wardrobe = get_or_create_user_wardrobe(chat_id)
+    for cat, items in user_wardrobe.items():
+        for i in items:
+            name = i["name"] if isinstance(i, dict) else i
+            if item.lower() == name.lower():
+                remove_clothing(chat_id, cat, item, fuzzy_threshold=100)
+                return True, cat
+    return False, None
