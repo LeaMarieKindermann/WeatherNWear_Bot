@@ -14,6 +14,7 @@ import requests
 import speech_to_text
 import intent_detection
 import text_to_speech
+import help_loader
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # For asynchronous operations
@@ -295,22 +296,18 @@ def handle_voice(message):
 @bot.message_handler(commands=["help", "hilfe"])
 def handle_help(message):
     language = getattr(message.from_user, "language_code", "de")
+    lang_key = "de" if language.startswith("de") else "en"
     keyboard = InlineKeyboardMarkup()
     
-    if language.startswith("de"):
-        help_text = """🤖 **WeatherNWear Bot Hilfe**
-
-Willkommen! Ich bin dein persönlicher Assistent für Kleidung und Wetter. Wähle eine Funktion aus, um mehr zu erfahren:"""
-        
+    # Get main help text from external file
+    help_text = help_loader.get_main_help_text(lang_key)
+    
+    if lang_key == "de":
         keyboard.add(InlineKeyboardButton("👔 Outfit-Empfehlungen", callback_data="help_packing"))
         keyboard.add(InlineKeyboardButton("🗓️ Routinen", callback_data="help_routines"))
         keyboard.add(InlineKeyboardButton("👗 Kleiderschrank", callback_data="help_wardrobe"))
         keyboard.add(InlineKeyboardButton("⏰ Erinnerungen", callback_data="help_reminders"))
     else:
-        help_text = """🤖 **WeatherNWear Bot Help**
-
-Welcome! I'm your personal assistant for clothing and weather. Choose a feature to learn more:"""
-        
         keyboard.add(InlineKeyboardButton("👔 Outfit Suggestions", callback_data="help_packing"))
         keyboard.add(InlineKeyboardButton("🗓️ Routines", callback_data="help_routines"))
         keyboard.add(InlineKeyboardButton("👗 Wardrobe", callback_data="help_wardrobe"))
@@ -322,152 +319,12 @@ Welcome! I'm your personal assistant for clothing and weather. Choose a feature 
 def handle_help_callback(call):
     feature = call.data.split("_")[1]
     language = getattr(call.from_user, "language_code", "de")
+    lang_key = "de" if language.startswith("de") else "en"
     chat_id = call.message.chat.id
     message_id = call.message.message_id
     
-    help_texts = {
-        "de": {
-            "packing": """👔 **Outfit-Empfehlungen**
-
-Ich helfe dir dabei, das perfekte Outfit für jedes Wetter zu finden!
-
-**Beispiele:**
-• "Was soll ich heute in München anziehen?"
-• "Outfit für morgen in Berlin"
-• "Was ziehe ich übermorgen an?"
-• "Packliste für Reise nach Paris"
-• "Brauche ich Wechselkleidung heute?"
-
-**Nach einer Empfehlung kannst du sagen:**
-• "Ich möchte lieber ein T-Shirt anziehen"
-• "Ich hätte gerne Shorts an"
-
-Ich lerne aus deinen Präferenzen! 🎯""",
-            
-            "routines": """🗓️ **Routinen**
-
-Erstelle tägliche Routinen für Outfit-Empfehlungen zu festen Zeiten!
-
-**Beispiele:**
-• "Erstelle eine Routine um 7:00 in München"
-• "Routine jeden Morgen um 6:30 in Berlin"
-• "Tägliche Nachricht um 8:15 für Hamburg"
-
-**Routinen verwalten:**
-• `/routines` - Alle Routinen anzeigen
-• `/delete_routine` - Routine löschen
-
-Du bekommst dann automatisch jeden Tag zur gewählten Zeit eine Outfit-Empfehlung! ⏰""",
-            
-            "wardrobe": """👗 **Kleiderschrank**
-
-Verwalte deinen persönlichen Kleiderschrank!
-
-**Kommandos:**
-• `/kleiderschrank` - Kleiderschrank-Menü öffnen
-
-**Natürliche Sprache:**
-• "Zeige meinen Kleiderschrank"
-• "Ich habe kein Hemd"
-• "Füge Jeans hinzu"
-
-**Was ich kann:**
-• Kleidung anzeigen, hinzufügen, entfernen
-• Automatische Kategorisierung
-• Wetterbasierte Empfehlungen
-
-Ich lerne deine Vorlieben und passe Empfehlungen an! 📚""",
-            
-            "reminders": """⏰ **Erinnerungen**
-
-Setze Erinnerungen für wichtige Dinge!
-
-**Beispiele:**
-• "Erinnere mich in 30 Minuten an Wäsche"
-• "Reminder morgen um 14:00 Meeting"
-• "Nicht vergessen heute Abend Sport"
-• "Benachrichtige mich in 2 Stunden"
-
-**Zeitangaben:**
-• Relative Zeit: "in 30 Minuten", "in 2 Stunden"
-• Absolute Zeit: "um 14:30", "morgen um 9:00"
-• Natürliche Sprache: "heute Abend", "morgen früh"
-
-Ich schicke dir zur gewünschten Zeit eine Benachrichtigung! 🔔"""
-        },
-        "en": {
-            "packing": """👔 **Outfit Suggestions**
-
-I help you find the perfect outfit for any weather!
-
-**Examples:**
-• "What should I wear today in Munich?"
-• "Outfit for tomorrow in Berlin"  
-• "What to wear the day after tomorrow?"
-• "Packing list for trip to Paris"
-• "Do I need a change of clothes today?"
-
-**After a suggestion you can say:**
-• "I would rather wear a T-shirt"
-• "I prefer shorts"
-
-I learn from your preferences! 🎯""",
-            
-            "routines": """🗓️ **Routines**
-
-Create daily routines for outfit suggestions at fixed times!
-
-**Examples:**
-• "Create a routine at 7:00 in Munich"
-• "Routine every morning at 6:30 in Berlin"
-• "Daily message at 8:15 for Hamburg"
-
-**Manage routines:**
-• `/routines` - Show all routines
-• `/delete_routine` - Delete routine
-
-You'll automatically get an outfit suggestion every day at your chosen time! ⏰""",
-            
-            "wardrobe": """👔 **Wardrobe**
-
-Manage your personal wardrobe!
-
-**Commands:**
-• `/wardrobe` - Open wardrobe menu
-
-**Natural language:**
-• "Show my wardrobe"
-• "I don't have a shirt"
-• "Add jeans"
-
-**What I can do:**
-• Show, add, remove clothing
-• Automatic categorization
-• Weather-based recommendations
-
-I learn your preferences and adapt suggestions! 📚""",
-            
-            "reminders": """⏰ **Reminders**
-
-Set reminders for important things!
-
-**Examples:**
-• "Remind me in 30 minutes about laundry"
-• "Reminder tomorrow at 2:00 PM meeting"
-• "Don't forget sports tonight"
-• "Notify me in 2 hours"
-
-**Time formats:**
-• Relative time: "in 30 minutes", "in 2 hours"
-• Absolute time: "at 2:30 PM", "tomorrow at 9:00 AM"
-• Natural language: "tonight", "tomorrow morning"
-
-I'll send you a notification at the desired time! 🔔"""
-        }
-    }
-    
-    lang = "de" if language.startswith("de") else "en"
-    help_text = help_texts[lang].get(feature, "Feature not found.")
+    # Get help text from external file
+    help_text = help_loader.format_help_text(feature, lang_key)
     
     # Edit the message to show the specific help text
     try:

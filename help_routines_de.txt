@@ -1,0 +1,14 @@
+🗓️ **Routinen**
+
+Erstelle tägliche Routinen für Outfit-Empfehlungen zu festen Zeiten!
+
+**Beispiele:**
+• "Erstelle eine Routine um 7:00 in München"
+• "Routine jeden Morgen um 6:30 in Berlin"
+• "Tägliche Nachricht um 8:15 für Hamburg"
+
+**Befehle:**
+• `/routines` - Alle Routinen anzeigen
+• `/delete_routine` - Routine löschen
+
+Du bekommst dann automatisch jeden Tag zur gewählten Zeit eine Outfit-Empfehlung! ⏰

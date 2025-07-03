@@ -1,0 +1,19 @@
+👕 **Kleiderschrank-Verwaltung**
+
+Ich helfe dir dabei, deinen Kleiderschrank zu organisieren und das perfekte Outfit zu finden!
+
+**📦 Verfügbare Befehle:**
+• `/wardrobe` - Hauptmenü öffnen
+
+**💬 Natürliche Sprache:**
+• "Zeig mir meine Klamotten"
+
+**🎛️ Menü-Aktionen:**
+• **Artikel hinzufügen** - Neues Kleidungsstück registrieren
+• **Artikel entfernen** - Ungewollte Items löschen
+• **Alle anzeigen** - Kompletten Kleiderschrank durchsuchen
+
+**✨ Was ich kann:**
+• Kleidungsstücke nach Typ kategorisieren (Oberteile, Hosen, Jacken, Schuhe, etc.)
+• Outfit-Kombinationen vorschlagen
+• Wettergerechte Empfehlungen geben

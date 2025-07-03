@@ -1,0 +1,16 @@
+👔 **Outfit Suggestions**
+
+I help you find the perfect outfit for any weather!
+
+**Examples:**
+• "What should I wear today in Munich?"
+• "Outfit for tomorrow in Berlin"
+• "What to wear the day after tomorrow in Neu-Ulm?"
+• "Packing list for trip to Paris"
+• "Do I need a change of clothes today at Eselsberg?"
+
+**After a suggestion you can say:**
+• "I would rather wear a T-shirt"
+• "I prefer shorts"
+
+I learn from your preferences! 🎯

@@ -1,0 +1,17 @@
+⏰ **Reminders & Appointments**
+
+I help you remember important appointments and tasks!
+
+**💬 Examples:**
+• "Remind me tomorrow at 7 am about an umbrella"
+• "Set a reminder for today 1:30 PM - apply sunscreen"
+• "Reminder: Meeting at 2:00 PM"
+
+**⏱️ Time Formats:**
+• **Absolute time:** "today 3:00 PM", "tomorrow 9:30 AM", "The day after tomorrow at 1 pm"
+• **Relative time:** "in 2 hours", "in 30 minutes"
+
+**⚠️ Important:**
+• I can only save future appointments
+• Past reminders are automatically deleted
+• You'll receive confirmation for each new reminder

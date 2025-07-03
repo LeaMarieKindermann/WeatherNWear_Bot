@@ -1,0 +1,18 @@
+⏰ **Erinnerungen & Termine**
+
+Ich helfe dir dabei, wichtige Termine und Aufgaben nicht zu vergessen!
+
+**💬 Beispiele:**
+• "Erinnere mich morgen um 7:00 Uhr an einen Regenschirm"
+• "Setze eine Erinnerung für heute 13:30 - Sonnencreme nutzen"
+• "Reminder: Meeting um 14:00"
+
+**⏱️ Zeitangaben:**
+• **Absolute Zeit:** "heute 15:00", "morgen 9:30", "Übermorgen um 14 Uhr"
+• **Relative Zeit:** "in 2 Stunden", "in 30 Minuten"
+
+**⚠️ Wichtig:**
+• Ich kann nur zukünftige Termine speichern
+• Vergangene Erinnerungen werden automatisch gelöscht
+• Du erhältst eine Bestätigung für jede neue Erinnerung
+

@@ -1,0 +1,19 @@
+👕 **Wardrobe Management**
+
+I help you organize your wardrobe and find the perfect outfit!
+
+**📦 Available Commands:**
+• `/wardrobe` - Open main menu
+
+**💬 Natural Language:**
+• "Show my wardrobe"
+
+**🎛️ Menu Actions:**
+• **Add Item** - Register new clothing piece
+• **Remove Item** - Delete unwanted items
+• **Show All** - Browse complete wardrobe
+
+**✨ What I can do:**
+• Categorize clothing by type (tops, pants, jackets, shoes, etc.)
+• Suggest outfit combinations
+• Provide weather-appropriate recommendations
