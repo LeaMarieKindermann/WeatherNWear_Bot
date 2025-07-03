@@ -168,6 +168,8 @@ def handle_text(message):
     response = None
     if intent == "packing":
         response = packing.handle_packing(bot, message, text, language)
+    elif intent == "preference":
+        response = packing.handle_preference_feedback(message.chat.id, text, language)
     elif intent == "routine":
         response = routines.handle_routine(bot, message, text, language)
     elif intent == "routine_list":

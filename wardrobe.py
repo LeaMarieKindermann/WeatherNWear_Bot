@@ -15,28 +15,64 @@ WARDROBE_PATH = "wardrobe.json"
 def get_default_wardrobe_de():
     return {
         "Oberteile": [
-            {"name": "Pullover", "min_temp": -20, "max_temp": 18, "prio": 1, "weather": "any"},
-            {"name": "Sweatshirt", "min_temp": -10, "max_temp": 20, "prio": 2, "weather": "any"},
-            {"name": "Hemd", "min_temp": 5, "max_temp": 25, "prio": 4, "weather": "any"},
-            {"name": "T-Shirt", "min_temp": 10, "max_temp": 40, "prio": 3, "weather": "sunny"}
+            {"name": "Pullover", "min_temp": -20, "max_temp": 18, "prio": 1, "weather": ["any"]},
+            {"name": "Sweatshirt", "min_temp": -10, "max_temp": 20, "prio": 2, "weather": ["any"]},
+            {"name": "Hoodie", "min_temp": -5, "max_temp": 22, "prio": 3, "weather": ["any"]},
+            {"name": "Hemd", "min_temp": 5, "max_temp": 25, "prio": 4, "weather": ["any"]},
+            {"name": "T-Shirt", "min_temp": 10, "max_temp": 40, "prio": 5, "weather": ["sunny", "cloudy"]},
+            {"name": "Langarmshirt", "min_temp": 0, "max_temp": 20, "prio": 6, "weather": ["any"]},
+            {"name": "Polo-Shirt", "min_temp": 12, "max_temp": 30, "prio": 7, "weather": ["sunny"]},
+            {"name": "Tank Top", "min_temp": 20, "max_temp": 45, "prio": 8, "weather": ["sunny"]},
+            {"name": "Bluse", "min_temp": 8, "max_temp": 28, "prio": 9, "weather": ["any"]},
+            {"name": "Cardigan", "min_temp": -5, "max_temp": 15, "prio": 10, "weather": ["any"]}
         ],
         "Hosen": [
-            {"name": "Jeans", "min_temp": -20, "max_temp": 25, "prio": 1, "weather": "any"},
-            {"name": "Jogginghose", "min_temp": -5, "max_temp": 20, "prio": 4, "weather": "cloudy"},
-            {"name": "Shorts", "min_temp": 18, "max_temp": 40, "prio": 3, "weather": "sunny"}
+            {"name": "Jeans", "min_temp": -20, "max_temp": 25, "prio": 1, "weather": ["any"]},
+            {"name": "Jogginghose", "min_temp": -5, "max_temp": 20, "prio": 2, "weather": ["cloudy"]},
+            {"name": "Shorts", "min_temp": 18, "max_temp": 40, "prio": 3, "weather": ["sunny"]},
+            {"name": "Chinos", "min_temp": 0, "max_temp": 30, "prio": 4, "weather": ["any"]},
+            {"name": "Leggings", "min_temp": -10, "max_temp": 25, "prio": 5, "weather": ["any"]},
+            {"name": "Cargo Hose", "min_temp": -5, "max_temp": 25, "prio": 6, "weather": ["any"]},
+            {"name": "Stoffhose", "min_temp": 5, "max_temp": 28, "prio": 7, "weather": ["any"]},
+            {"name": "Bermuda Shorts", "min_temp": 15, "max_temp": 35, "prio": 8, "weather": ["sunny"]},
+            {"name": "Thermohose", "min_temp": -25, "max_temp": 5, "prio": 9, "weather": ["snow"]},
+            {"name": "Rock", "min_temp": 10, "max_temp": 35, "prio": 10, "weather": ["sunny", "cloudy"]}
         ],
         "Jacken": [
-            {"name": "Jacke", "min_temp": -20, "max_temp": 15, "prio": 1, "weather": "cloudy"},
-            {"name": "Mantel", "min_temp": -20, "max_temp": 10, "prio": 2, "weather": "cloudy"},
-            {"name": "Regenjacke", "min_temp": 0, "max_temp": 20, "prio": 3, "weather": "rain"}
+            {"name": "Winterjacke", "min_temp": -25, "max_temp": 5, "prio": 1, "weather": ["snow", "cloudy"]},
+            {"name": "Mantel", "min_temp": -20, "max_temp": 10, "prio": 2, "weather": ["cloudy", "rain"]},
+            {"name": "Regenjacke", "min_temp": 0, "max_temp": 20, "prio": 3, "weather": ["rain"]},
+            {"name": "Übergangsjacke", "min_temp": -5, "max_temp": 15, "prio": 4, "weather": ["cloudy"]},
+            {"name": "Lederjacke", "min_temp": 5, "max_temp": 20, "prio": 5, "weather": ["any"]},
+            {"name": "Jeansjacke", "min_temp": 8, "max_temp": 22, "prio": 6, "weather": ["any"]},
+            {"name": "Bomberjacke", "min_temp": 3, "max_temp": 18, "prio": 7, "weather": ["any"]},
+            {"name": "Weste", "min_temp": 0, "max_temp": 12, "prio": 8, "weather": ["any"]},
+            {"name": "Fleecejacke", "min_temp": -10, "max_temp": 10, "prio": 9, "weather": ["any"]},
+            {"name": "Softshell", "min_temp": -5, "max_temp": 15, "prio": 10, "weather": ["cloudy", "rain"]}
         ],
         "Schuhe": [
-            {"name": "Stiefel", "min_temp": -20, "max_temp": 10, "prio": 1, "weather": "snow"},
-            {"name": "Sneaker", "min_temp": 5, "max_temp": 30, "prio": 2, "weather": "any"}
+            {"name": "Winterstiefel", "min_temp": -25, "max_temp": 5, "prio": 1, "weather": ["snow"]},
+            {"name": "Sneaker", "min_temp": 5, "max_temp": 30, "prio": 2, "weather": ["any"]},
+            {"name": "Halbschuhe", "min_temp": 0, "max_temp": 25, "prio": 3, "weather": ["any"]},
+            {"name": "Sandalen", "min_temp": 18, "max_temp": 40, "prio": 4, "weather": ["sunny"]},
+            {"name": "Gummistiefel", "min_temp": -5, "max_temp": 20, "prio": 5, "weather": ["rain"]},
+            {"name": "Laufschuhe", "min_temp": -5, "max_temp": 35, "prio": 6, "weather": ["any"]},
+            {"name": "Boots", "min_temp": -15, "max_temp": 15, "prio": 7, "weather": ["any"]},
+            {"name": "Flip-Flops", "min_temp": 22, "max_temp": 45, "prio": 8, "weather": ["sunny"]},
+            {"name": "Businessschuhe", "min_temp": -5, "max_temp": 30, "prio": 9, "weather": ["any"]},
+            {"name": "Hausschuhe", "min_temp": -10, "max_temp": 25, "prio": 10, "weather": ["any"]}
         ],
         "Accessoires": [
-            {"name": "Mütze", "min_temp": -20, "max_temp": 8, "prio": 2, "weather": "snow"},
-            {"name": "Schal", "min_temp": -20, "max_temp": 10, "prio": 2, "weather": "snow"}
+            {"name": "Wintermütze", "min_temp": -25, "max_temp": 5, "prio": 1, "weather": ["snow", "cloudy"]},
+            {"name": "Schal", "min_temp": -20, "max_temp": 10, "prio": 2, "weather": ["snow", "cloudy"]},
+            {"name": "Handschuhe", "min_temp": -20, "max_temp": 8, "prio": 3, "weather": ["snow", "cloudy"]},
+            {"name": "Sonnenbrille", "min_temp": 10, "max_temp": 45, "prio": 4, "weather": ["sunny"]},
+            {"name": "Gürtel", "min_temp": -20, "max_temp": 40, "prio": 5, "weather": ["any"]},
+            {"name": "Regenschirm", "min_temp": -5, "max_temp": 30, "prio": 6, "weather": ["rain"]},
+            {"name": "Baseballcap", "min_temp": 8, "max_temp": 35, "prio": 7, "weather": ["sunny"]},
+            {"name": "Stirnband", "min_temp": -10, "max_temp": 15, "prio": 8, "weather": ["any"]},
+            {"name": "Uhr", "min_temp": -20, "max_temp": 40, "prio": 9, "weather": ["any"]},
+            {"name": "Rucksack", "min_temp": -20, "max_temp": 40, "prio": 10, "weather": ["any"]}
         ]
     }
 
@@ -46,28 +82,64 @@ def get_default_wardrobe_de():
 def get_default_wardrobe_en():
     return {
         "Tops": [
-            {"name": "Sweater", "min_temp": -20, "max_temp": 18, "prio": 1, "weather": "any"},
-            {"name": "Hoodie", "min_temp": -10, "max_temp": 20, "prio": 2, "weather": "any"},
-            {"name": "Shirt", "min_temp": 5, "max_temp": 25, "prio": 4, "weather": "any"},
-            {"name": "T-shirt", "min_temp": 10, "max_temp": 40, "prio": 3, "weather": "sunny"}
+            {"name": "Sweater", "min_temp": -20, "max_temp": 18, "prio": 1, "weather": ["any"]},
+            {"name": "Hoodie", "min_temp": -10, "max_temp": 20, "prio": 2, "weather": ["any"]},
+            {"name": "Sweatshirt", "min_temp": -5, "max_temp": 22, "prio": 3, "weather": ["any"]},
+            {"name": "Shirt", "min_temp": 5, "max_temp": 25, "prio": 4, "weather": ["any"]},
+            {"name": "T-shirt", "min_temp": 10, "max_temp": 40, "prio": 5, "weather": ["sunny", "cloudy"]},
+            {"name": "Long sleeve", "min_temp": 0, "max_temp": 20, "prio": 6, "weather": ["any"]},
+            {"name": "Polo shirt", "min_temp": 12, "max_temp": 30, "prio": 7, "weather": ["sunny"]},
+            {"name": "Tank top", "min_temp": 20, "max_temp": 45, "prio": 8, "weather": ["sunny"]},
+            {"name": "Blouse", "min_temp": 8, "max_temp": 28, "prio": 9, "weather": ["any"]},
+            {"name": "Cardigan", "min_temp": -5, "max_temp": 15, "prio": 10, "weather": ["any"]}
         ],
         "Pants": [
-            {"name": "Jeans", "min_temp": -20, "max_temp": 25, "prio": 1, "weather": "any"},
-            {"name": "Sweatpants", "min_temp": -5, "max_temp": 20, "prio": 4, "weather": "cloudy"},
-            {"name": "Shorts", "min_temp": 18, "max_temp": 40, "prio": 3, "weather": "sunny"}
+            {"name": "Jeans", "min_temp": -20, "max_temp": 25, "prio": 1, "weather": ["any"]},
+            {"name": "Sweatpants", "min_temp": -5, "max_temp": 20, "prio": 2, "weather": ["cloudy"]},
+            {"name": "Shorts", "min_temp": 18, "max_temp": 40, "prio": 3, "weather": ["sunny"]},
+            {"name": "Chinos", "min_temp": 0, "max_temp": 30, "prio": 4, "weather": ["any"]},
+            {"name": "Leggings", "min_temp": -10, "max_temp": 25, "prio": 5, "weather": ["any"]},
+            {"name": "Cargo pants", "min_temp": -5, "max_temp": 25, "prio": 6, "weather": ["any"]},
+            {"name": "Dress pants", "min_temp": 5, "max_temp": 28, "prio": 7, "weather": ["any"]},
+            {"name": "Bermuda shorts", "min_temp": 15, "max_temp": 35, "prio": 8, "weather": ["sunny"]},
+            {"name": "Thermal pants", "min_temp": -25, "max_temp": 5, "prio": 9, "weather": ["snow"]},
+            {"name": "Skirt", "min_temp": 10, "max_temp": 35, "prio": 10, "weather": ["sunny", "cloudy"]}
         ],
         "Jackets": [
-            {"name": "Jacket", "min_temp": -20, "max_temp": 15, "prio": 1, "weather": "cloudy"},
-            {"name": "Coat", "min_temp": -20, "max_temp": 10, "prio": 2, "weather": "cloudy"},
-            {"name": "Rain jacket", "min_temp": 0, "max_temp": 20, "prio": 3, "weather": "rain"}
+            {"name": "Winter jacket", "min_temp": -25, "max_temp": 5, "prio": 1, "weather": ["snow", "cloudy"]},
+            {"name": "Coat", "min_temp": -20, "max_temp": 10, "prio": 2, "weather": ["cloudy", "rain"]},
+            {"name": "Rain jacket", "min_temp": 0, "max_temp": 20, "prio": 3, "weather": ["rain"]},
+            {"name": "Spring jacket", "min_temp": -5, "max_temp": 15, "prio": 4, "weather": ["cloudy"]},
+            {"name": "Leather jacket", "min_temp": 5, "max_temp": 20, "prio": 5, "weather": ["any"]},
+            {"name": "Denim jacket", "min_temp": 8, "max_temp": 22, "prio": 6, "weather": ["any"]},
+            {"name": "Bomber jacket", "min_temp": 3, "max_temp": 18, "prio": 7, "weather": ["any"]},
+            {"name": "Vest", "min_temp": 0, "max_temp": 12, "prio": 8, "weather": ["any"]},
+            {"name": "Fleece jacket", "min_temp": -10, "max_temp": 10, "prio": 9, "weather": ["any"]},
+            {"name": "Softshell", "min_temp": -5, "max_temp": 15, "prio": 10, "weather": ["cloudy", "rain"]}
         ],
         "Shoes": [
-            {"name": "Boots", "min_temp": -20, "max_temp": 10, "prio": 1, "weather": "snow"},
-            {"name": "Sneakers", "min_temp": 5, "max_temp": 30, "prio": 2, "weather": "any"}
+            {"name": "Winter boots", "min_temp": -25, "max_temp": 5, "prio": 1, "weather": ["snow"]},
+            {"name": "Sneakers", "min_temp": 5, "max_temp": 30, "prio": 2, "weather": ["any"]},
+            {"name": "Dress shoes", "min_temp": 0, "max_temp": 25, "prio": 3, "weather": ["any"]},
+            {"name": "Sandals", "min_temp": 18, "max_temp": 40, "prio": 4, "weather": ["sunny"]},
+            {"name": "Rain boots", "min_temp": -5, "max_temp": 20, "prio": 5, "weather": ["rain"]},
+            {"name": "Running shoes", "min_temp": -5, "max_temp": 35, "prio": 6, "weather": ["any"]},
+            {"name": "Boots", "min_temp": -15, "max_temp": 15, "prio": 7, "weather": ["any"]},
+            {"name": "Flip-flops", "min_temp": 22, "max_temp": 45, "prio": 8, "weather": ["sunny"]},
+            {"name": "Loafers", "min_temp": -5, "max_temp": 30, "prio": 9, "weather": ["any"]},
+            {"name": "Slippers", "min_temp": -10, "max_temp": 25, "prio": 10, "weather": ["any"]}
         ],
         "Accessories": [
-            {"name": "Beanie", "min_temp": -20, "max_temp": 8, "prio": 2, "weather": "snow"},
-            {"name": "Scarf", "min_temp": -20, "max_temp": 10, "prio": 2, "weather": "snow"}
+            {"name": "Winter hat", "min_temp": -25, "max_temp": 5, "prio": 1, "weather": ["snow", "cloudy"]},
+            {"name": "Scarf", "min_temp": -20, "max_temp": 10, "prio": 2, "weather": ["snow", "cloudy"]},
+            {"name": "Gloves", "min_temp": -20, "max_temp": 8, "prio": 3, "weather": ["snow", "cloudy"]},
+            {"name": "Sunglasses", "min_temp": 10, "max_temp": 45, "prio": 4, "weather": ["sunny"]},
+            {"name": "Belt", "min_temp": -20, "max_temp": 40, "prio": 5, "weather": ["any"]},
+            {"name": "Umbrella", "min_temp": -5, "max_temp": 30, "prio": 6, "weather": ["rain"]},
+            {"name": "Baseball cap", "min_temp": 8, "max_temp": 35, "prio": 7, "weather": ["sunny"]},
+            {"name": "Headband", "min_temp": -10, "max_temp": 15, "prio": 8, "weather": ["any"]},
+            {"name": "Watch", "min_temp": -20, "max_temp": 40, "prio": 9, "weather": ["any"]},
+            {"name": "Backpack", "min_temp": -20, "max_temp": 40, "prio": 10, "weather": ["any"]}
         ]
     }
 

@@ -63,17 +63,27 @@ def get_outfit_suggestion(chat_id, location, dt, language="de"):
     weather_type_disp = translate_weather_type(weather_type, language)
     _, user_wardrobe = wardrobe.get_or_create_user_wardrobe(chat_id, language)
     suggestion = []
+    suggestion_dict = {}
     for cat, items in user_wardrobe.items():
-        filtered = [i for i in items if isinstance(i, dict) and i['min_temp'] <= temp <= i['max_temp'] and (i.get('weather', 'any') == 'any' or i.get('weather', 'any') == weather_type)]
+        filtered = [i for i in items if isinstance(i, dict) and i['min_temp'] <= temp <= i['max_temp'] and (
+            (isinstance(i.get('weather', 'any'), list) and ('any' in i.get('weather', ['any']) or weather_type in i.get('weather', []))) or
+            (isinstance(i.get('weather', 'any'), str) and (i.get('weather', 'any') == 'any' or i.get('weather', 'any') == weather_type))
+        )]
         if filtered:
             # Sort by priority (lower is better)
             filtered.sort(key=lambda x: x['prio'])
-            suggestion.append(f"{cat}: {filtered[0]['name']}")
+            # Find all items with the best (lowest) prio
+            best_prio = filtered[0]['prio']
+            best_items = [item for item in filtered if item['prio'] == best_prio]
+            chosen = random.choice(best_items)
+            suggestion.append(f"{cat}: {chosen['name']}")
+            suggestion_dict[cat] = chosen['name']
         else:
             if language.startswith("de"):
                 suggestion.append(f"{cat}: Keine passende {cat.lower()} gefunden.")
             else:
                 suggestion.append(f"{cat}: No suitable {cat.lower()} found.")
+    save_last_suggestion_with_context(chat_id, suggestion_dict, temp, weather_type)
     if language.startswith("de"):
         return f"Für {location} am {dt.strftime('%d.%m.%Y')} (ca. {temp}°C, Wetter: {weather_type_disp}) schlage ich vor:\n" + "\n".join(suggestion)
     else:
@@ -108,7 +118,10 @@ def get_packing_list(chat_id, location, start_date, end_date, language="de"):
     _, user_wardrobe = wardrobe.get_or_create_user_wardrobe(chat_id, language)
     packing = []
     for cat, items in user_wardrobe.items():
-        filtered = [i for i in items if isinstance(i, dict) and i['min_temp'] <= max_temp and i['max_temp'] >= min_temp and (i.get('weather', 'any') == 'any' or i.get('weather', 'any') in weather_types)]
+        filtered = [i for i in items if isinstance(i, dict) and i['min_temp'] <= max_temp and i['max_temp'] >= min_temp and (
+            (isinstance(i.get('weather', 'any'), list) and ('any' in i.get('weather', ['any']) or any(wt in i.get('weather', []) for wt in weather_types))) or
+            (isinstance(i.get('weather', 'any'), str) and (i.get('weather', 'any') == 'any' or i.get('weather', 'any') in weather_types))
+        )]
         if filtered:
             filtered.sort(key=lambda x: x['prio'])
             packing.append(f"{cat}: {filtered[0]['name']}")
@@ -278,3 +291,153 @@ def translate_weather_type(weather_type, language):
     }
     lang = "de" if language.startswith("de") else "en"
     return mapping[lang].get(weather_type, weather_type)
+
+def save_last_suggestion(chat_id, suggestion_dict):
+    """Save the last outfit suggestion for a user (per chat_id) to suggestion_context.json."""
+    try:
+        # Load existing data
+        if os.path.exists("suggestion_context.json"):
+            with open("suggestion_context.json", "r", encoding="utf-8") as f:
+                data = json.load(f)
+        else:
+            data = {}
+        
+        # Save suggestion for this user
+        data[str(chat_id)] = suggestion_dict
+        
+        # Write back to file
+        with open("suggestion_context.json", "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"[save_last_suggestion] Error: {e}")
+
+def save_last_suggestion_with_context(chat_id, suggestion_dict, temp, weather_type):
+    """Save the last outfit suggestion with weather context for a user (per chat_id) to suggestion_context.json."""
+    try:
+        # Load existing data
+        if os.path.exists("suggestion_context.json"):
+            with open("suggestion_context.json", "r", encoding="utf-8") as f:
+                data = json.load(f)
+        else:
+            data = {}
+        
+        # Save suggestion with context for this user
+        data[str(chat_id)] = {
+            'suggestions': suggestion_dict,
+            'temp': temp,
+            'weather_type': weather_type
+        }
+        
+        # Write back to file
+        with open("suggestion_context.json", "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"[save_last_suggestion_with_context] Error: {e}")
+
+def load_last_suggestion(chat_id):
+    """Load the last outfit suggestion for a user (per chat_id) from suggestion_context.json."""
+    try:
+        if os.path.exists("suggestion_context.json"):
+            with open("suggestion_context.json", "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return data.get(str(chat_id), None)
+        else:
+            return None
+    except Exception as e:
+        print(f"[load_last_suggestion] Error: {e}")
+        return None
+
+def handle_preference_feedback(chat_id, user_message, language="de"):
+    """
+    Handles user feedback like 'Ich möchte lieber ein T-Shirt anziehen' and updates wardrobe priorities/weather/temperature.
+    Args:
+        chat_id: Telegram user id
+        user_message: str, the user's feedback message
+        language: 'de' or 'en'
+    Returns:
+        str: Confirmation or prompt for more info
+    """
+    # Load last suggestion and weather context
+    suggestion_context = load_last_suggestion(chat_id)
+    if not suggestion_context:
+        return ("Ich habe keine vorherige Outfit-Empfehlung gefunden. Bitte frage zuerst nach einer Empfehlung."
+                if language.startswith("de") else
+                "I couldn't find a previous outfit suggestion. Please ask for a suggestion first.")
+    
+    # Extract the last suggestion and weather context
+    last_suggestion = suggestion_context.get('suggestions', {})
+    current_temp = suggestion_context.get('temp', 20)
+    current_weather = suggestion_context.get('weather_type', 'any')
+    # Use spaCy to extract clothing item from user_message
+    nlp = nlp_de if language.startswith("de") else nlp_en
+    doc = nlp(user_message)
+    # Try to find noun (potential clothing item)
+    preferred_item = None
+    for token in doc:
+        if token.pos_ == "NOUN" or token.pos_ == "PROPN":
+            preferred_item = token.text.strip()
+            break
+    if not preferred_item:
+        return ("Ich konnte kein Kleidungsstück erkennen. Bitte formuliere deinen Wunsch klarer (z.B. 'Ich möchte lieber ein T-Shirt anziehen')."
+                if language.startswith("de") else
+                "I couldn't detect a clothing item. Please specify your wish more clearly (e.g. 'I would rather wear a T-shirt').")
+    # Find item in wardrobe
+    _, user_wardrobe = wardrobe.get_or_create_user_wardrobe(chat_id, language)
+    found = False
+    found_cat = None
+    for cat, items in user_wardrobe.items():
+        for item in items:
+            if isinstance(item, dict) and preferred_item.lower() == item['name'].lower():
+                found = True
+                found_cat = cat
+                break
+        if found:
+            break
+    if not found:
+        # Give user instructions to add the item to their wardrobe
+        if language.startswith("de"):
+            return (f"Ich habe '{preferred_item}' nicht in deinem Kleiderschrank gefunden. "
+                    f"Du kannst es hinzufügen, indem du /kleiderschrank eingibst und es dort hinzufügst")
+                    # TODO or via natural language 
+        else:
+            return (f"I couldn't find '{preferred_item}' in your wardrobe. "
+                    f"You can add it by entering /wardrobe and adding it there.")
+                    # TODO or via natural language
+    # Update priorities, temperature ranges, and weather for preferred item
+    current_suggested = last_suggestion.get(found_cat)
+    prios = [item['prio'] for item in user_wardrobe[found_cat] if isinstance(item, dict) and 'prio' in item]
+    min_prio = min(prios) if prios else 0
+    
+    for item in user_wardrobe[found_cat]:
+        if isinstance(item, dict):
+            if item['name'].lower() == preferred_item.lower():
+                # Update priority (always lowest)
+                item['prio'] = min_prio - 1
+                
+                # Update temperature range (expand to include current temp)
+                if current_temp < item.get('min_temp', 0):
+                    item['min_temp'] = current_temp
+                if current_temp > item.get('max_temp', 50):
+                    item['max_temp'] = current_temp
+                
+                # Update weather (add current weather to list if not already present)
+                current_weather_list = item.get('weather', ['any'])
+                if isinstance(current_weather_list, str):
+                    # Convert old string format to list
+                    current_weather_list = [current_weather_list] if current_weather_list != 'any' else ['any']
+                
+                if current_weather not in current_weather_list and current_weather != 'any':
+                    if 'any' in current_weather_list:
+                        # If 'any' is present, replace it with specific weather types
+                        current_weather_list = [current_weather]
+                    else:
+                        current_weather_list.append(current_weather)
+                
+                item['weather'] = current_weather_list
+    # Save updated wardrobe
+    data = wardrobe.load_wardrobe()
+    data[str(chat_id)][0] = user_wardrobe
+    wardrobe.save_wardrobe(data)
+    return (f"Ich habe '{preferred_item}' priorisiert und an die aktuellen Bedingungen angepasst (Temperatur: {current_temp}°C, Wetter: {translate_weather_type(current_weather, language)}). Es wird dir beim nächsten Mal bevorzugt vorgeschlagen."
+            if language.startswith("de") else
+            f"I've prioritized '{preferred_item}' and adapted it to current conditions (Temperature: {current_temp}°C, Weather: {translate_weather_type(current_weather, language)}). It will be suggested to you next time.")
