@@ -4,9 +4,7 @@ import spacy
 nlp_de = spacy.load("de_core_news_sm") # python -m spacy download de_core_news_sm to install the German model
 nlp_en = spacy.load("en_core_web_sm") # python -m spacy download en_core_web_sm to install the English model
 
-from apscheduler.schedulers.background import BackgroundScheduler
 import random
-import requests
 
 # To safe the reminder information, we use a JSON file
 import json
@@ -291,25 +289,6 @@ def translate_weather_type(weather_type, language):
     }
     lang = "de" if language.startswith("de") else "en"
     return mapping[lang].get(weather_type, weather_type)
-
-def save_last_suggestion(chat_id, suggestion_dict):
-    """Save the last outfit suggestion for a user (per chat_id) to suggestion_context.json."""
-    try:
-        # Load existing data
-        if os.path.exists("suggestion_context.json"):
-            with open("suggestion_context.json", "r", encoding="utf-8") as f:
-                data = json.load(f)
-        else:
-            data = {}
-        
-        # Save suggestion for this user
-        data[str(chat_id)] = suggestion_dict
-        
-        # Write back to file
-        with open("suggestion_context.json", "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-    except Exception as e:
-        print(f"[save_last_suggestion] Error: {e}")
 
 def save_last_suggestion_with_context(chat_id, suggestion_dict, temp, weather_type):
     """Save the last outfit suggestion with weather context for a user (per chat_id) to suggestion_context.json."""

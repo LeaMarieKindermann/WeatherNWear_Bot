@@ -7,8 +7,6 @@ from rapidfuzz import fuzz
 nlp_de = spacy.load("de_core_news_sm")  # python -m spacy download de_core_news_sm to install the German model
 nlp_en = spacy.load("en_core_web_sm")   # python -m spacy download en_core_web_sm to install the English model
 
-WARDROBE_PATH = "wardrobe.json"
-
 # Default wardrobe for German users
 # Priority scale is 1 (highest) to 5 (lowest)
 
@@ -155,10 +153,10 @@ Load the wardrobe.json file or create it if it does not exist.
 Returns the wardrobe data as a dictionary.
 """
 def load_wardrobe():
-    if not os.path.exists(WARDROBE_PATH):
-        with open(WARDROBE_PATH, "w", encoding="utf-8") as f:
+    if not os.path.exists("wardrobe.json"):
+        with open("wardrobe.json", "w", encoding="utf-8") as f:
             json.dump({}, f)
-    with open(WARDROBE_PATH, "r", encoding="utf-8") as f:
+    with open("wardrobe.json", "r", encoding="utf-8") as f:
         content = f.read().strip()
         if not content:
             return {}
@@ -176,7 +174,7 @@ Args:
     data: The complete wardrobe dictionary to save.
 """
 def save_wardrobe(data):
-    with open(WARDROBE_PATH, "w", encoding="utf-8") as f:
+    with open("wardrobe.json", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
