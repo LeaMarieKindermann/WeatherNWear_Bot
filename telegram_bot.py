@@ -1,4 +1,6 @@
 # Modules to import
+import re
+
 import telebot
 import os
 
@@ -10,6 +12,8 @@ import wardrobe
 import reminder
 import weather
 import requests
+import matplotlib
+from PIL import Image, ImageDraw, ImageFont
 
 import speech_to_text
 import intent_detection
@@ -339,6 +343,103 @@ def handle_help_callback(call):
         bot.send_message(chat_id, help_text, parse_mode="Markdown")
     
     bot.answer_callback_query(call.id)
+
+def get_weather_icon_path(description):
+    """Gibt den Pfad zum passenden Wettersymbol zurück (statt Emoji)."""
+    description = description.lower()
+    print(description)
+    if "sunny" in description or "clear" in description or "sonnig" in description:
+        return "assets/icons/sun.png"
+    elif "cloudy" in description or "bewölkt" in description:
+        return "assets/icons/cloud.png"
+    elif "rain" in description or "regenfall" in description:
+        return "assets/icons/rain.png"
+    elif "snow" in description or "schneefall" in description:
+        return "assets/icons/snow.png"
+    elif "fog" in description or "nebel" in description:
+        return "assets/icons/fog.png"
+    elif "drizzle" in description or "nieselregen" in description:
+        return "assets/icons/drizzle.png"
+    elif "ice pellets" in description or "hagel" in description:
+        return "assets/icons/hail.png"
+    elif "sleet shower" in description or "graupelschauer" in description:
+        return "assets/icons/sleet.png"
+    elif "thunder" in description or "gewitter" in description:
+        return "assets/icons/thunder.png"
+    else:
+        return "assets/icons/unknown.png"
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("weather_chart|"))
+def handle_weather_chart_callback(call):
+    location = call.data.split("|", 1)[1]
+    try:
+        forecast_data = []
+        for day in range(3):
+            data = weather.get_weather(location, "de", day)
+            print(data)
+            if data:
+                parts = data['text'].split("Ø")[1].split("°C")[0].strip()
+                avg_temp = float(parts)
+                match = re.search(r":\s*(.*?)\,\s*Ø", data['text'])
+                if match:
+                    desc = match.group(1)
+                else:
+                    desc = "Keine Daten"
+                forecast_data.append({
+                    "day": ["Heute", "Morgen", "Übermorgen"][day],
+                    "temp": avg_temp,
+                    "desc": desc
+                })
+            else:
+                forecast_data.append({
+                    "day": ["Heute", "Morgen", "Übermorgen"][day],
+                    "temp": 0,
+                    "desc": "Keine Daten"
+                })
+
+        # Vorlage laden
+        base_image = Image.open("assets/Ort.png").convert("RGBA")
+        draw = ImageDraw.Draw(base_image)
+
+        base_dir = os.path.dirname(os.path.abspath(__file__))  # Ordner deines Skripts
+        font_path_regular = os.path.join(base_dir, "assets", "fonts", "Roboto-Regular.ttf")
+        font_path_bold = os.path.join(base_dir, "assets", "fonts", "Roboto-Bold.ttf")
+
+        # Schrift laden mit gewünschter Größe:
+        font_large = ImageFont.truetype(font_path_bold, 40)  # Große, fette Schrift
+        font_small = ImageFont.truetype(font_path_regular, 30)  # Kleinere normale Schrift
+
+        # Wetterdaten auf die Vorlage zeichnen
+        card_width = base_image.width // 3
+        draw.text((card_width+70, 50), f"{location}", font=font_large, fill="black")
+        for i, forecast in enumerate(forecast_data):
+            x_offset = [150, 115, 80]  # Eigene X-Verschiebungen für Spalte 0, 1, 2
+            icon_offset = [110, 115, 110]
+            x = i * card_width + x_offset[i]
+            y = 800  # Y-Position bleibt gleich
+
+            icon_path = get_weather_icon_path(forecast["desc"])
+            print("ICON PATH UNTEN:" + icon_path)
+            if os.path.exists(icon_path):
+                icon = Image.open(icon_path).convert("RGBA").resize((340, 340))
+                base_image.paste(icon, (x - icon_offset[i], 340), icon)
+
+            draw.text((x, y), f"{forecast['temp']}°C", font=font_large, fill="black")
+            draw.text((x, y + 60), forecast["desc"], font=font_small, fill="black")
+
+
+        # Bild speichern & senden
+        image_path = f"{location}_forecast.png"
+        base_image.save(image_path)
+
+        with open(image_path, "rb") as photo:
+            bot.send_photo(call.message.chat.id, photo, caption=f"📊 Wetterkarte für {location}")
+
+        os.remove(image_path)
+        bot.answer_callback_query(call.id)
+    except Exception as e:
+        print(f"Fehler beim Generieren der Wettergrafik: {e}")
+        bot.answer_callback_query(call.id, text="Fehler beim Erzeugen der Grafik.", show_alert=True)
 
 # Set the bot commands    
 bot.set_my_commands([

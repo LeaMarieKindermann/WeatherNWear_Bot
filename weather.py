@@ -5,6 +5,7 @@ from reminder import normalize_time_string
 from wnw_bot_api_token import weather_API_TOKEN
 # from reminder import parse_time_expression
 from datetime import datetime, timedelta
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # Load the language models for German and English
 nlp_de = spacy.load("de_core_news_sm") # python -m spacy download de_core_news_sm to install the German model
@@ -183,13 +184,21 @@ def handle_weather_location(bot, message, location):
     }
 
     for day in range(3):
-        weather = get_weather(location, "de", day)
-        if weather:
-            forecast_texts.append(f"{labels.get(day)}:\n{weather['text'].split(':', 1)[1].strip()}")
+        weather_data = get_weather(location, "de", day)
+        if weather_data:
+            forecast_texts.append(f"{labels.get(day)}:\n{weather_data['text'].split(':', 1)[1].strip()}")
         else:
             forecast_texts.append(f"{labels.get(day)}: ⚠️ Leider keine Wetterdaten verfügbar.")
 
     outro = "\n\n❗ Hinweis: Wetterdaten können sich kurzfristig ändern."
     full_forecast = intro + "\n\n".join(forecast_texts) + outro
 
-    return full_forecast
+    # Inline-Buttons: Vorlesen & Wettergrafik
+    keyboard = InlineKeyboardMarkup()
+    keyboard.add(
+        InlineKeyboardButton("🔊 Vorlesen", callback_data=f"tts|de"),
+        InlineKeyboardButton("📊 Wettergrafik anzeigen", callback_data=f"weather_chart|{location}")
+    )
+
+    bot.send_message(message.chat.id, full_forecast, reply_markup=keyboard)
+
