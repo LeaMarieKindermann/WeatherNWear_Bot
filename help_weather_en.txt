@@ -1,0 +1,14 @@
+🗓️ **Routines**
+
+Create daily routines for outfit suggestions at fixed times!
+
+**Examples:**
+• "Create a routine at 7:00 in Munich"
+• "Routine every morning at 6:30 in Berlin"
+• "Daily message at 8:15 for Hamburg"
+
+**Commands:**
+• `/routines` - Show all routines
+• `/delete_routine` - Delete routine
+
+You'll automatically get an outfit suggestion every day at your chosen time! ⏰

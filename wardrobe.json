@@ -1,1 +1,474 @@
-{}
+{
+  "7807161636": [
+    {
+      "Oberteile": [
+        {
+          "name": "Pullover",
+          "min_temp": -20,
+          "max_temp": 18,
+          "prio": 1,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Sweatshirt",
+          "min_temp": -10,
+          "max_temp": 20,
+          "prio": 2,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Hoodie",
+          "min_temp": -5,
+          "max_temp": 22,
+          "prio": 3,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Hemd",
+          "min_temp": 5,
+          "max_temp": 25,
+          "prio": 4,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "T-Shirt",
+          "min_temp": 10,
+          "max_temp": 40,
+          "prio": 5,
+          "weather": [
+            "sunny",
+            "cloudy"
+          ]
+        },
+        {
+          "name": "Langarmshirt",
+          "min_temp": 0,
+          "max_temp": 20,
+          "prio": 6,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Polo-Shirt",
+          "min_temp": 12,
+          "max_temp": 30,
+          "prio": 7,
+          "weather": [
+            "sunny"
+          ]
+        },
+        {
+          "name": "Tank Top",
+          "min_temp": 20,
+          "max_temp": 45,
+          "prio": 8,
+          "weather": [
+            "sunny"
+          ]
+        },
+        {
+          "name": "Bluse",
+          "min_temp": 8,
+          "max_temp": 28,
+          "prio": 9,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Cardigan",
+          "min_temp": -5,
+          "max_temp": 15,
+          "prio": 10,
+          "weather": [
+            "any"
+          ]
+        }
+      ],
+      "Hosen": [
+        {
+          "name": "Jeans",
+          "min_temp": -20,
+          "max_temp": 25,
+          "prio": 1,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Jogginghose",
+          "min_temp": -5,
+          "max_temp": 20,
+          "prio": 2,
+          "weather": [
+            "cloudy"
+          ]
+        },
+        {
+          "name": "Shorts",
+          "min_temp": 18,
+          "max_temp": 40,
+          "prio": 3,
+          "weather": [
+            "sunny"
+          ]
+        },
+        {
+          "name": "Chinos",
+          "min_temp": 0,
+          "max_temp": 30,
+          "prio": 4,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Leggings",
+          "min_temp": -10,
+          "max_temp": 25,
+          "prio": 5,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Cargo Hose",
+          "min_temp": -5,
+          "max_temp": 25,
+          "prio": 6,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Stoffhose",
+          "min_temp": 5,
+          "max_temp": 28,
+          "prio": 7,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Bermuda Shorts",
+          "min_temp": 15,
+          "max_temp": 35,
+          "prio": 8,
+          "weather": [
+            "sunny"
+          ]
+        },
+        {
+          "name": "Thermohose",
+          "min_temp": -25,
+          "max_temp": 5,
+          "prio": 9,
+          "weather": [
+            "snow"
+          ]
+        },
+        {
+          "name": "Rock",
+          "min_temp": 10,
+          "max_temp": 35,
+          "prio": 10,
+          "weather": [
+            "sunny",
+            "cloudy"
+          ]
+        }
+      ],
+      "Jacken": [
+        {
+          "name": "Winterjacke",
+          "min_temp": -25,
+          "max_temp": 5,
+          "prio": 1,
+          "weather": [
+            "snow",
+            "cloudy"
+          ]
+        },
+        {
+          "name": "Mantel",
+          "min_temp": -20,
+          "max_temp": 10,
+          "prio": 2,
+          "weather": [
+            "cloudy",
+            "rain"
+          ]
+        },
+        {
+          "name": "Regenjacke",
+          "min_temp": 0,
+          "max_temp": 20,
+          "prio": 3,
+          "weather": [
+            "rain"
+          ]
+        },
+        {
+          "name": "Übergangsjacke",
+          "min_temp": -5,
+          "max_temp": 15,
+          "prio": 4,
+          "weather": [
+            "cloudy"
+          ]
+        },
+        {
+          "name": "Lederjacke",
+          "min_temp": 5,
+          "max_temp": 20,
+          "prio": 5,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Jeansjacke",
+          "min_temp": 8,
+          "max_temp": 22,
+          "prio": 6,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Bomberjacke",
+          "min_temp": 3,
+          "max_temp": 18,
+          "prio": 7,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Weste",
+          "min_temp": 0,
+          "max_temp": 12,
+          "prio": 8,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Fleecejacke",
+          "min_temp": -10,
+          "max_temp": 10,
+          "prio": 9,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Softshell",
+          "min_temp": -5,
+          "max_temp": 15,
+          "prio": 10,
+          "weather": [
+            "cloudy",
+            "rain"
+          ]
+        }
+      ],
+      "Schuhe": [
+        {
+          "name": "Winterstiefel",
+          "min_temp": -25,
+          "max_temp": 5,
+          "prio": 1,
+          "weather": [
+            "snow"
+          ]
+        },
+        {
+          "name": "Sneaker",
+          "min_temp": 5,
+          "max_temp": 30,
+          "prio": 2,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Halbschuhe",
+          "min_temp": 0,
+          "max_temp": 25,
+          "prio": 3,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Sandalen",
+          "min_temp": 18,
+          "max_temp": 40,
+          "prio": 4,
+          "weather": [
+            "sunny"
+          ]
+        },
+        {
+          "name": "Gummistiefel",
+          "min_temp": -5,
+          "max_temp": 20,
+          "prio": 5,
+          "weather": [
+            "rain"
+          ]
+        },
+        {
+          "name": "Laufschuhe",
+          "min_temp": -5,
+          "max_temp": 35,
+          "prio": 6,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Boots",
+          "min_temp": -15,
+          "max_temp": 15,
+          "prio": 7,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Flip-Flops",
+          "min_temp": 22,
+          "max_temp": 45,
+          "prio": 8,
+          "weather": [
+            "sunny"
+          ]
+        },
+        {
+          "name": "Businessschuhe",
+          "min_temp": -5,
+          "max_temp": 30,
+          "prio": 9,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Hausschuhe",
+          "min_temp": -10,
+          "max_temp": 25,
+          "prio": 10,
+          "weather": [
+            "any"
+          ]
+        }
+      ],
+      "Accessoires": [
+        {
+          "name": "Wintermütze",
+          "min_temp": -25,
+          "max_temp": 5,
+          "prio": 1,
+          "weather": [
+            "snow",
+            "cloudy"
+          ]
+        },
+        {
+          "name": "Schal",
+          "min_temp": -20,
+          "max_temp": 10,
+          "prio": 2,
+          "weather": [
+            "snow",
+            "cloudy"
+          ]
+        },
+        {
+          "name": "Handschuhe",
+          "min_temp": -20,
+          "max_temp": 8,
+          "prio": 3,
+          "weather": [
+            "snow",
+            "cloudy"
+          ]
+        },
+        {
+          "name": "Sonnenbrille",
+          "min_temp": 10,
+          "max_temp": 45,
+          "prio": 4,
+          "weather": [
+            "sunny"
+          ]
+        },
+        {
+          "name": "Gürtel",
+          "min_temp": -20,
+          "max_temp": 40,
+          "prio": 5,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Regenschirm",
+          "min_temp": -5,
+          "max_temp": 30,
+          "prio": 6,
+          "weather": [
+            "rain"
+          ]
+        },
+        {
+          "name": "Baseballcap",
+          "min_temp": 8,
+          "max_temp": 35,
+          "prio": 7,
+          "weather": [
+            "sunny"
+          ]
+        },
+        {
+          "name": "Stirnband",
+          "min_temp": -10,
+          "max_temp": 15,
+          "prio": 8,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Uhr",
+          "min_temp": -20,
+          "max_temp": 40,
+          "prio": 9,
+          "weather": [
+            "any"
+          ]
+        },
+        {
+          "name": "Rucksack",
+          "min_temp": -20,
+          "max_temp": 40,
+          "prio": 10,
+          "weather": [
+            "any"
+          ]
+        }
+      ]
+    }
+  ]
+}
