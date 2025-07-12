@@ -372,13 +372,31 @@ def get_weather_icon_path(description):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("weather_chart|"))
 def handle_weather_chart_callback(call):
+    """
+        Handles the callback to generate and send a 3-day weather forecast image for the selected location.
+
+        This function:
+        - Fetches weather data for the next 3 days from the API
+        - Extracts average temperature and weather description
+        - Selects the appropriate weather icons
+        - Draws the weather data onto a predefined image template (forecast card)
+        - Sends the generated forecast image back to the Telegram chat
+
+        Steps:
+        1. Reads the location from callback data
+        2. Retrieves weather forecast data for 3 days
+        3. Draws temperatures, descriptions, and icons on the image template
+        4. Sends the completed image as a photo message
+        5. Deletes the temporary image file afterwards
+
+        Args:
+            call: The callback query object from the Telegram bot (contains chat/user info)
+        """
     location = call.data.split("|", 1)[1]
     try:
-        # Sprache automatisch erkennen
         user_lang = call.from_user.language_code
         lang = "de" if user_lang.startswith("de") else "en"
 
-        # Ressourcen je nach Sprache
         if lang == "de":
             background_path = "assets/Forecast_de.png"
             days = ["Heute", "Morgen", "Übermorgen"]
@@ -395,7 +413,6 @@ def handle_weather_chart_callback(call):
             data = weather.get_weather(location, lang, day)
             print(data)
             if data and "text" in data:
-                # Temperatur extrahieren (sicher!)
                 if temp_marker in data['text']:
                     try:
                         parts = data['text'].split(temp_marker)[1].split("°C")[0].strip()
@@ -405,7 +422,6 @@ def handle_weather_chart_callback(call):
                 else:
                     avg_temp = 0.0
 
-                # Beschreibung extrahieren (sicher!)
                 pattern = r":\s*(.*?)\,\s*" + re.escape(regex_marker)
                 match = re.search(pattern, data['text'])
                 if match:
@@ -425,7 +441,7 @@ def handle_weather_chart_callback(call):
                     "desc": "No data" if lang == "en" else "Keine Daten"
                 })
 
-        # Vorlage laden
+        # Load the forecast image template
         base_image = Image.open(background_path).convert("RGBA")
         draw = ImageDraw.Draw(base_image)
 
@@ -433,11 +449,11 @@ def handle_weather_chart_callback(call):
         font_path_regular = os.path.join(base_dir, "assets", "fonts", "Roboto-Regular.ttf")
         font_path_bold = os.path.join(base_dir, "assets", "fonts", "Roboto-Bold.ttf")
 
-        # Schrift laden
+        # Load fonts with desired sizes
         font_large = ImageFont.truetype(font_path_bold, 40)
         font_small = ImageFont.truetype(font_path_regular, 25)
 
-        # Zeichnen
+        # Draw weather data onto the template
         card_width = base_image.width // 3
         draw.text((card_width + 70, 50), f"{location}", font=font_large, fill="black")
         for i, forecast in enumerate(forecast_data):
@@ -455,7 +471,7 @@ def handle_weather_chart_callback(call):
             draw.text((x, y), f"{forecast['temp']}°C", font=font_large, fill="black")
             draw.text((x, y + 60), forecast["desc"], font=font_small, fill="black")
 
-        # Bild speichern & senden
+        # Save and send the image
         image_path = f"{location}_forecast.png"
         base_image.save(image_path)
 
@@ -474,8 +490,7 @@ def handle_weather_chart_callback(call):
 bot.set_my_commands([
     telebot.types.BotCommand("start", "Greetings"),
     telebot.types.BotCommand("help", "Show bot features and examples"),
-    telebot.types.BotCommand("routines", "Set Routine"),
-    telebot.types.BotCommand("delete_routine", "Delete a Routine"),
+    telebot.types.BotCommand("routines", "Show all saved routines"),
     telebot.types.BotCommand("kleiderschrank", "Bearbeiten des Kleiderschranks"),
     telebot.types.BotCommand("wardrobe", "Manage your wardrobe")
 ])

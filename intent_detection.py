@@ -68,7 +68,7 @@ class IntentDetector:
                     "exact_phrases": ["routine"]
                 },
                 "routine_list": {
-                    "keywords": ["alle routinen", "zeige routinen", "liste routinen", "meine routinen"],
+                    "keywords": ["alle routinen", "zeige routinen", "liste routinen", "meine routinen", "zeige mir alle routinen", "zeige mir meine routinen"],
                     "patterns": [
                         r"\b(alle\s+routinen|zeige?\s+routinen|liste\s+routinen)\b",
                         r"\b(meine?\s+routinen?)\b"

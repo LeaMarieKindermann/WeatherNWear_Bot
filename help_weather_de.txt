@@ -2,20 +2,12 @@
 
 Erhalte den aktuellen Wetterbericht oder eine 3-Tage-Wettervorhersage für deinen Ort!
 
-**Beispiele:**
+**💬 Beispiele:**
 • „Wie wird das Wetter morgen in Stuttgart?“
 • „Wetter in Berlin heute“
-• „Weather in London tomorrow“
-• „Forecast for New York the day after tomorrow“
 
 **Funktionen:**
 • Automatische Standort-Erkennung aus deinem Text
-• Unterstützt Deutsch & Englisch
 • Zeigt aktuelles Wetter oder Vorhersage für heute, morgen oder übermorgen
 • Detaillierte Wetterinfos: Temperatur, Wind, Luftfeuchtigkeit
 • 3-Tage-Vorhersage inklusive Wettergrafik & Vorlese-Funktion
-
-**Befehle:**
-• `/weather` – Starte eine Wetterabfrage
-
-Du kannst auch einfach eine Nachricht wie „Wie wird das Wetter morgen in München?“ senden!

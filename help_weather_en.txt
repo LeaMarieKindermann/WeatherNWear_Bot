@@ -1,14 +1,15 @@
-🗓️ **Routines**
+🌤️ **Weather**
 
-Create daily routines for outfit suggestions at fixed times!
+Get the latest weather report or a 3-day weather forecast for your location!
 
-**Examples:**
-• "Create a routine at 7:00 in Munich"
-• "Routine every morning at 6:30 in Berlin"
-• "Daily message at 8:15 for Hamburg"
+**💬 Examples:**
+- “What will the weather be like tomorrow in Stuttgart?”
+- “Weather in Berlin today”
 
-**Commands:**
-• `/routines` - Show all routines
-• `/delete_routine` - Delete routine
+**Functions:**
+- Automatic location detection from your text
+- Shows current weather or forecast for today, tomorrow or the day after tomorrow
+- Detailed weather information: Temperature, wind, humidity
+- 3-day forecast including weather graphics & read-aloud function
 
-You'll automatically get an outfit suggestion every day at your chosen time! ⏰
+Translated with DeepL.com (free version)
