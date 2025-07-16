@@ -346,7 +346,9 @@ def handle_help_callback(call):
 
 
 def get_weather_icon_path(description):
-    """Gibt den Pfad zum passenden Wettersymbol zurück."""
+    """
+        Gibt den Pfad zum passenden Wettersymbol zurück
+    """
     description = description.lower()
     if "sunny" in description or "clear" in description or "sonnig" in description:
         return "assets/icons/sun.png"
@@ -485,6 +487,42 @@ def handle_weather_chart_callback(call):
     except Exception as e:
         print(f"Fehler beim Generieren der Wettergrafik: {e}")
         bot.answer_callback_query(call.id, text="Fehler beim Erzeugen der Grafik.", show_alert=True)
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("delete_routine|"))
+def handle_delete_routine_callback(call):
+    try:
+        _, chat_id, index, language = call.data.split("|")
+        index = int(index)
+        user_routines = routines.user_info.get(chat_id, [])
+
+        if 0 <= index < len(user_routines):
+            routine = user_routines.pop(index)
+            routines.save_user_information(routines.user_info)
+
+            # Scheduler-Job entfernen
+            job_id = f"routine_{chat_id}_{routine['city']}_{routine['hour']:02d}_{routine['minute']:02d}"
+            if routines.scheduler.get_job(job_id):
+                routines.scheduler.remove_job(job_id)
+
+            # Ausgabe
+            city = routine["city"]
+            time_str = f"{routine['hour']:02d}:{routine['minute']:02d}"
+
+            if language.startswith("de"):
+                msg = f"✅ Routine gelöscht: {time_str} Uhr in {city}."
+            else:
+                msg = f"✅ Routine deleted: {time_str} in {city}."
+
+            bot.edit_message_text(
+                msg,
+                chat_id=call.message.chat.id,
+                message_id=call.message.message_id
+            )
+        else:
+            bot.answer_callback_query(call.id, text="Invalid routine number." if language == "en" else "Ungültige Routinenummer.")
+    except Exception as e:
+        print("Fehler beim Löschen:", e)
+        bot.answer_callback_query(call.id, text="Error while deleting." if "en" in call.data else "Fehler beim Löschen.")
 
 # Set the bot commands    
 bot.set_my_commands([

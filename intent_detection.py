@@ -57,13 +57,13 @@ class IntentDetector:
                     "exact_phrases": ["kleiderschrank", "wardrobe"]
                 },
                 "routine": {
-                    "keywords": ["routine", "tagesablauf", "erstelle", "täglich", "jeden tag", "morgens", "ablauf"],
+                    "keywords": ["routine", "tagesablauf", "erstelle", "mache", "erstellen", "täglich", "jeden tag", "morgens", "ablauf"],
                     "patterns": [
-                        r"\b(erstelle?\s+(eine\s+)?routine)\b",
-                        r"\b(täglich(e|en)?\s+(nachricht|empfehlung))\b",
-                        r"\b(jeden\s+tag\s+um)\b",
-                        r"\b(routine\s+(um|für))\b",
-                        r"\b(morgens?\s+um)\b.*\b(routine|nachricht)\b"
+                        r"\b(mache|erstelle|erstellen)\s+(eine\s+)?routine(\s+für)?\b",
+                        r"\broutine\s+(für|um)\s+\w+\s+\d{1,2}[:.]?\d{0,2}",
+                        r"\b(jeden\s+tag\s+um\s+\d{1,2}[:.]?\d{0,2})\b",
+                        r"\btäglich(e|en)?\s+(nachricht|empfehlung)\b",
+                        r"\bmorgens?\s+um\s+\d{1,2}[:.]?\d{0,2}\b.*\b(routine|nachricht)\b",
                     ],
                     "exact_phrases": ["routine"]
                 },
@@ -98,10 +98,11 @@ class IntentDetector:
                 "weather": {
                     "keywords": ["wetter", "regen", "sonne", "schnee", "bewölkt", "temperatur", "grad"],
                     "patterns": [
-                        r"\b(wie\s+ist\s+das\s+wetter)\b",
-                        r"\b(wetter\s+(in|für))\b",
-                        r"\b(grad\s+(celsius|fahrenheit))\b",
-                        r"\b(regnet\s+es|schneit\s+es|scheint\s+die\s+sonne)\b"
+                        r"\b(wie\s+(ist|wird)\s+das\s+wetter(.*?)?)\b",
+                        r"\b(wetter\s+(in|für)\s+\w+)\b",
+                        r"\b(wie\s+(wird|ist)\s+das\s+wetter\s+(heute|morgen|übermorgen|am\s+\w+|in\s+\d+\s+tagen?))\b",
+                        r"\b(regnet\s+es|schneit\s+es|scheint\s+die\s+sonne)\b",
+                        r"\b(grad\s+(celsius|fahrenheit))\b"
                     ],
                     "exact_phrases": ["wetter"]
                 }
@@ -194,9 +195,13 @@ class IntentDetector:
                     "keywords": ["weather", "rain", "sun", "snow", "cloudy", "temperature", "degrees"],
                     "patterns": [
                         r"\b(what's\s+the\s+weather)\b",
+                        r"\b(whats\s+the\s+weather)\b",
                         r"\b(weather\s+(in|for))\b",
                         r"\b(degrees?\s+(celsius|fahrenheit))\b",
-                        r"\b(is\s+it\s+(raining|snowing|sunny))\b"
+                        r"\b(temperature|degrees?\s+(celsius|fahrenheit)?)\b",
+                        r"\b(is\s+it\s+(raining|snowing|sunny))\b",
+                        r"\b(will\s+it\s+(rain|snow|be\s+sunny|be\s+cloudy))\b",
+                        r"\b(how\s+(is|will)\s+the\s+weather(\s+(be)?)?)\b",
                     ],
                     "exact_phrases": ["weather"]
                 }
