@@ -165,6 +165,31 @@ def handle_wardrobe_action(call):
         bot.answer_callback_query(call.id)
         return
     
+# Handler for /help command
+@bot.message_handler(commands=["help", "hilfe"])
+def handle_help(message):
+    language = getattr(message.from_user, "language_code", "de")
+    lang_key = "de" if language.startswith("de") else "en"
+    keyboard = InlineKeyboardMarkup()
+    
+    # Get main help text from external file
+    help_text = help_loader.get_main_help_text(lang_key)
+    
+    if lang_key == "de":
+        keyboard.add(InlineKeyboardButton("👔 Outfit-Empfehlungen", callback_data="help_packing"))
+        keyboard.add(InlineKeyboardButton("🗓️ Routinen", callback_data="help_routines"))
+        keyboard.add(InlineKeyboardButton("👗 Kleiderschrank", callback_data="help_wardrobe"))
+        keyboard.add(InlineKeyboardButton("⏰ Erinnerungen", callback_data="help_reminders"))
+        keyboard.add(InlineKeyboardButton("⏰ Wetter", callback_data="help_weather"))
+    else:
+        keyboard.add(InlineKeyboardButton("👔 Outfit Suggestions", callback_data="help_packing"))
+        keyboard.add(InlineKeyboardButton("🗓️ Routines", callback_data="help_routines"))
+        keyboard.add(InlineKeyboardButton("👗 Wardrobe", callback_data="help_wardrobe"))
+        keyboard.add(InlineKeyboardButton("⏰ Reminders", callback_data="help_reminders"))
+        keyboard.add(InlineKeyboardButton("⏰ Weather", callback_data="help_weather"))
+    
+    bot.send_message(message.chat.id, help_text, reply_markup=keyboard, parse_mode="Markdown")
+    
 # Function to interpret the user's intent if it is not a command
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
@@ -298,31 +323,6 @@ def handle_voice(message):
     else:
         bot.reply_to(message, "Sorry, I couldn't understand your voice message.")
 
-
-# Handler for /help command
-@bot.message_handler(commands=["help", "hilfe"])
-def handle_help(message):
-    language = getattr(message.from_user, "language_code", "de")
-    lang_key = "de" if language.startswith("de") else "en"
-    keyboard = InlineKeyboardMarkup()
-    
-    # Get main help text from external file
-    help_text = help_loader.get_main_help_text(lang_key)
-    
-    if lang_key == "de":
-        keyboard.add(InlineKeyboardButton("👔 Outfit-Empfehlungen", callback_data="help_packing"))
-        keyboard.add(InlineKeyboardButton("🗓️ Routinen", callback_data="help_routines"))
-        keyboard.add(InlineKeyboardButton("👗 Kleiderschrank", callback_data="help_wardrobe"))
-        keyboard.add(InlineKeyboardButton("⏰ Erinnerungen", callback_data="help_reminders"))
-        keyboard.add(InlineKeyboardButton("⏰ Wetter", callback_data="help_weather"))
-    else:
-        keyboard.add(InlineKeyboardButton("👔 Outfit Suggestions", callback_data="help_packing"))
-        keyboard.add(InlineKeyboardButton("🗓️ Routines", callback_data="help_routines"))
-        keyboard.add(InlineKeyboardButton("👗 Wardrobe", callback_data="help_wardrobe"))
-        keyboard.add(InlineKeyboardButton("⏰ Reminders", callback_data="help_reminders"))
-        keyboard.add(InlineKeyboardButton("⏰ Weather", callback_data="help_weather"))
-    
-    bot.send_message(message.chat.id, help_text, reply_markup=keyboard, parse_mode="Markdown")
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("help_"))
 def handle_help_callback(call):
