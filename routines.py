@@ -87,7 +87,6 @@ def get_time_of_day(hour):
     else:
         return "night"
 
-
 def convert_to_24h_format(time_input):
     """
         Converts a time string (e.g. '7:30', '0730PM', '18') to 24-hour hour and minute values.
@@ -165,52 +164,6 @@ def extract_routine_details(text, language):
 
     return None, None, None
 
-def generate_clothing_tip(weather_text, language):
-    """
-        Generates a clothing recommendation based on the average temperature in the weather report.
-
-        Args:
-            weather_text (str): The weather description text.
-            language (str): Language code ('de' or 'en').
-
-        Returns:
-            str: A language-specific clothing tip.
-    """
-    match = re.search(r'Ø\s*(-?\d+(?:[.,]\d+)?)\s*°C', weather_text)
-    if not match:
-        return {
-            "de": "Check das Wetter vorsichtshalber nochmal!",
-            "en": "Better double-check the weather just in case!"
-        }.get(language, "Check the weather!")
-
-    temp_str = match.group(1).replace(',', '.')
-    try:
-        temp = float(temp_str)
-    except ValueError:
-        return {
-            "de": "Check das Wetter vorsichtshalber nochmal!",
-            "en": "Better double-check the weather just in case!"
-        }.get(language, "Check the weather!")
-
-    if language == "de":
-        if temp < 5:
-            return "Zieh dich warm an – Mütze und Schal könnten helfen!"
-        elif temp < 15:
-            return "Eine wärmere Jacke oder ein Hoodie zum drüberziehen ist eine gute Idee."
-        elif temp < 25:
-            return "Leichte Kleidung reicht aus."
-        else:
-            return "Perfektes T-Shirt-Wetter!"
-    else:
-        if temp < 5:
-            return "Bundle up – a hat and scarf might help!"
-        elif temp < 15:
-            return "A warm jacket or hoodie is a smart choice."
-        elif temp < 25:
-            return "Light clothing is fine."
-        else:
-            return "Perfect t-shirt weather!"
-
 def schedule_daily_message(bot, chat_id, city, hour, minute, language):
     """
         Schedules a daily message at a specified time using APScheduler.
@@ -258,7 +211,6 @@ def send_daily_routine(bot, chat_id, city, language, hour, minute):
                          )
         return
 
-    # NEU: Dynamisch generierter Kleidungstipp auf Basis der echten User-Garderobe
     dt = datetime.now().replace(hour=hour, minute=minute, second=0, microsecond=0)
     clothing_tip = packing.get_outfit_suggestion(chat_id, weather['location'], dt, language)
 
@@ -291,7 +243,6 @@ def send_daily_routine(bot, chat_id, city, language, hour, minute):
         msg += f"{t['mood']}: {mood}"
 
     bot.send_message(chat_id, msg)
-
 
 def handle_routine(bot, message, text, language):
     """

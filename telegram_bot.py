@@ -29,9 +29,42 @@ bot = telebot.TeleBot(api_token, parse_mode=None)  # You can set parse_mode by d
 
 ## Define a function to send a welcome message
 def send_welcome(message):
-    first_name = message.from_user.first_name if message.from_user.first_name else ""
-    last_name = message.from_user.last_name if message.from_user.last_name else ""
-    bot.reply_to(message, f"Welcome, {first_name} {last_name}!")
+    user_lang = getattr(message.from_user, "language_code", "en")
+    first_name = message.from_user.first_name or "there"
+
+    if user_lang.startswith("de"):
+        welcome_text = (
+            f"👋 Hallo, {first_name}! Ich bin *Weather 'n Wear* - dein smarter Telegram-Assistent für alltägliche Outfit-Entscheidungen.\n\n"
+            "Ich kann dir helfen, anhand des aktuellen Wetters und deiner Vorlieben zu entscheiden, was du anziehst. Das kann ich für dich tun:\n\n"
+            "🌤 *Abfrage der lokalen Wettervorhersage*\n"
+            "👚 *Vorschläge, was du anziehen sollst*\n"
+            "📦 *Vorschläge, was du einpacken sollst*\n"
+            "🔔 *Tagesaktuelle Wettervorhersagen*\n"
+            "👖 *Anpassung an deine Garderobe und Kleidungsauswahl*\n\n"
+            "Sag mir einfach etwas wie:\n"
+            "• _“Was soll ich heute in München anziehen?”_\n"
+            "• _“Wie ist das Wetter in Berlin?”_\n"
+            "• _“Erstellen eine Routine für 8:30 Uhr in München”_\n\n"
+            "Fertig? Lass uns das Anziehen einfacher machen - jeden Tag!"
+        )
+    else:
+        welcome_text = (
+            f"👋 Hello, {first_name}! I’m *Weather ‘n Wear* – your smart Telegram assistant for everyday outfit decisions.\n\n"
+            "I can help you decide what to wear based on the current weather and your preferences. Here's what I can do for you:\n\n"
+            "🌤 *Get the local weather forecast*\n"
+            "👚 *Suggest what to wear*\n"
+            "📦 *Tell you what to pack*\n"
+            "🔔 *Send daily weather updates*\n"
+            "👖 *Adapt to your wardrobe and clothing choices*\n\n"
+            "Just tell me something like:\n"
+            "• _“What should I wear today in Munich?”_\n"
+            "• _“What’s the weather like in Berlin?”_\n"
+            "• _“Create a routine for 8:30 in Munich”_\n\n"
+            "Ready? Let’s make dressing easier – every day!"
+        )
+
+    bot.send_message(chat_id=message.chat.id, text=welcome_text, parse_mode="Markdown")
+
 
 def send_reply_with_tts_button(message, reply_text, lang):
     """

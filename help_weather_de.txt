@@ -4,8 +4,8 @@ Ich helfe dir dabei, das Wetter für heute oder die nächsten Tage herauszufinde
 
 💬 Natürliche Sprache:
 • „Wie wird das Wetter morgen in Berlin?“
-• „Wetter in Hamburg am Donnerstag“
-• „Weather in Munich in 2 days“
+• „Wetter in Hamburg am Donnerstag?“
+• „Wie wird das Wetter in 2 Tagen in Mögglingen?“
 
 🎛️ Menü-Aktionen:
 • Wetter anzeigen – Tagesaktuelle oder 3-Tage-Vorhersage abrufen

@@ -116,7 +116,7 @@ def extract_location(text, language):
     doc = nlp(text)
 
     for ent in doc.ents:
-        if ent.label_ in ("LOC", "GPE"):  # 🔧 <-- Hier der Fix
+        if ent.label_ in ("LOC", "GPE"):
             print(ent.text)
             return ent.text
 
@@ -314,7 +314,6 @@ def handle_weather_location(bot, message, location):
     outro = "\n\n❗ Hinweis: Wetterdaten können sich kurzfristig ändern."
     full_forecast = intro + "\n\n".join(forecast_texts) + outro
 
-    # Inline-Buttons: Vorlesen & Wettergrafik
     keyboard = InlineKeyboardMarkup()
     keyboard.add(
         InlineKeyboardButton("🔊 Vorlesen", callback_data=f"tts|de"),
