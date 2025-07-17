@@ -3,7 +3,7 @@
 Ich helfe dir dabei, deinen Kleiderschrank zu organisieren und das perfekte Outfit zu finden!
 
 **📦 Verfügbare Befehle:**
-• `/wardrobe` - Hauptmenü öffnen
+• /wardrobe - Hauptmenü öffnen
 
 **💬 Natürliche Sprache:**
 • "Zeig meine Klamotten"

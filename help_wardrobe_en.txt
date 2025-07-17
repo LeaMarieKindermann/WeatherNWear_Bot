@@ -3,7 +3,7 @@
 I help you organize your wardrobe and find the perfect outfit!
 
 **📦 Available Commands:**
-• `/wardrobe` - Open main menu
+• /wardrobe - Open main menu
 
 **💬 Natural Language:**
 • "Show my wardrobe"

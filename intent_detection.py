@@ -23,7 +23,7 @@ class IntentDetector:
                 },
                 "packing": {
                     "keywords": ["einpacken", "packen", "mitnehmen", "anziehen", "outfit", "kleidung", 
-                               "was soll ich", "empfehlung", "vorschlag", "tragen", "ziehe", "morgen an", "heute an"],
+                               "was soll ich", "empfehlung", "vorschlag", "tragen", "ziehe"],
                     "patterns": [
                         r"\b(was\s+soll\s+ich\s+(an)?ziehen|anziehen)\b",
                         r"\b(was\s+zieh(e|st)\s+ich\s+(morgen|heute|übermorgen))\b",
@@ -48,7 +48,7 @@ class IntentDetector:
                     "exact_phrases": ["kleiderschrank", "wardrobe"]
                 },
                 "routine": {
-                    "keywords": ["routine", "tagesablauf", "erstelle", "mache", "erstellen", "täglich", "jeden tag", "morgens", "ablauf"],
+                    "keywords": ["routine", "tagesablauf", "erstelle", "mache", "erstellen", "täglich", "jeden tag", "ablauf"],
                     "patterns": [
                         r"\b(mache|erstelle|erstellen)\s+(eine\s+)?routine(\s+für)?\b",
                         r"\broutine\s+(für|um)\s+\w+\s+\d{1,2}[:.]?\d{0,2}",
@@ -230,6 +230,7 @@ class IntentDetector:
         
         # Priority order for intent detection
         intent_priority = [
+            "weather",
             "preference",     # Check preferences before packing/wardrobe
             "routine_list",   # Check specific routines before general routine
             "routine_delete", 
@@ -237,7 +238,6 @@ class IntentDetector:
             "wardrobe",
             "routine", 
             "reminder",
-            "weather",
             "help"
         ]
         

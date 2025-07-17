@@ -15,6 +15,7 @@ Args:
     text (str): The text to analyze.
 """
 def detect_language(text):
+    rerun = 0
     """
     Detect the language of a given text using langdetect with confidence scoring.
     Returns the ISO language code (e.g. 'de', 'en').
@@ -63,6 +64,9 @@ def detect_language(text):
     except (LangDetectException, Exception):
         pass
     
+    if rerun < 5:
+        rerun += 1
+        return detect_language(text)
     # If ML detection fails completely, return None
     return None
 
