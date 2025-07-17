@@ -11,15 +11,6 @@ class IntentDetector:
         self.threshold = 80
         self.intent_config = {
             "de": {
-                "help": {
-                    "keywords": ["hilfe", "help", "anleitung", "unterstützung", "erklärung"],
-                    "patterns": [
-                        r"\b(wie\s+funktioniert|was\s+kann|erkläre|zeige?\s+mir|hilf\s+mir)\b",
-                        r"\b(bot\s+(hilfe|funktionen|features))\b",
-                        r"\b(was\s+kannst\s+du)\b"
-                    ],
-                    "exact_phrases": ["hilfe", "help", "?", "info"]
-                },
                 "preference": {
                     "keywords": ["lieber", "bevorzuge", "anstatt", "statt", "will", "möchte", "hätte gerne"],
                     "patterns": [
@@ -105,19 +96,18 @@ class IntentDetector:
                         r"\b(grad\s+(celsius|fahrenheit))\b"
                     ],
                     "exact_phrases": ["wetter"]
+                },
+                "help": {
+                    "keywords": ["hilfe", "help", "anleitung", "unterstützung", "erklärung"],
+                    "patterns": [
+                        r"\b(wie\s+funktioniert|was\s+kann|erkläre|hilf\s+mir)\b",
+                        r"\b(bot\s+(hilfe|funktionen|features))\b",
+                        r"\b(was\s+kannst\s+du)\b"
+                    ],
+                    "exact_phrases": ["hilfe", "help", "?", "info"]
                 }
             },
             "en": {
-                "help": {
-                    "keywords": ["help", "how", "what can", "explain", "show me", "guide", "info"],
-                    "patterns": [
-                        r"\b(how\s+(do|does|can)|what\s+can\s+you)\b",
-                        r"\b(help\s+me|show\s+me)\b",
-                        r"\b(bot\s+(help|features|functions))\b",
-                        r"\b(explain|guide|info)\b"
-                    ],
-                    "exact_phrases": ["help", "?", "info"]
-                },
                 "preference": {
                     "keywords": ["rather", "prefer", "instead", "would like", "want to wear"],
                     "patterns": [
@@ -204,6 +194,16 @@ class IntentDetector:
                         r"\b(how\s+(is|will)\s+the\s+weather(\s+(be)?)?)\b",
                     ],
                     "exact_phrases": ["weather"]
+                },
+                "help": {
+                    "keywords": ["help", "how", "what can", "explain", "guide", "info"],
+                    "patterns": [
+                        r"\b(how\s+(do|does|can)|what\s+can\s+you)\b",
+                        r"\b(help\s+me)\b",
+                        r"\b(bot\s+(help|features|functions))\b",
+                        r"\b(explain|guide|info)\b"
+                    ],
+                    "exact_phrases": ["help", "?", "info"]
                 }
             }
         }
@@ -230,7 +230,6 @@ class IntentDetector:
         
         # Priority order for intent detection
         intent_priority = [
-            "help",           # Check help first as it's often short and ambiguous
             "preference",     # Check preferences before packing/wardrobe
             "routine_list",   # Check specific routines before general routine
             "routine_delete", 
@@ -238,23 +237,29 @@ class IntentDetector:
             "wardrobe",
             "routine", 
             "reminder",
-            "weather"
+            "weather",
+            "help"
         ]
         
         # Method 1: Exact phrase matching (highest priority)
         for intent in intent_priority:
             if self._check_exact_phrases(text_lower, intent, lang_key):
+                print(f"Exact match found for intent: {intent}")
                 return intent
         
-        # Method 2: Regex pattern matching (medium priority)  
-        for intent in intent_priority:
-            if self._check_patterns(text_lower, intent, lang_key):
-                return intent
-                
-        # Method 3: Fuzzy keyword matching (lowest priority)
+        # Method 2: Fuzzy keyword matching (medium priority)
         for intent in intent_priority:
             if self._check_keywords(text_lower, intent, lang_key):
+                print(f"Keyword match found for intent: {intent}")
                 return intent
+
+        # Method 2: Regex pattern matching (lowest priority)  
+        for intent in intent_priority:
+            if self._check_patterns(text_lower, intent, lang_key):
+                print(f"Pattern match found for intent: {intent}")
+                return intent
+                
+        
         
         return None
     
