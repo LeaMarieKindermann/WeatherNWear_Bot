@@ -3,17 +3,17 @@
 Ich helfe dir dabei, tägliche Routinen mit Wetterberichten und passenden Kleidungstipps einzurichten – automatisch zur richtigen Uhrzeit! ⏰🌦️
 
 📦 Verfügbare Befehle:
-• /routines – Hauptmenü öffnen
+• /routines – Zeigt alle gespeicherten Routinen
 
 💬 Natürliche Sprache:
 • „Routine um 7:00 in Berlin“
 • „Routine für 8:30 in München erstellen“
-• „Show all routines“
+• „Zeige alle Routinen“
 
-🎛️ Menü-Aktionen:
-• Routine hinzufügen – Neue Routine anlegen
-• Routine entfernen – Geplante Nachrichten löschen
-• Alle anzeigen – Gespeicherte Routinen durchsuchen
+🎛️ Features:
+• Routine hinzufügen
+• Routine entfernen
+• Alle angelegten Routinen anzeigen
 
 ✨ Was ich kann:
 • Uhrzeit & Stadt automatisch aus Text erkennen

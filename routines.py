@@ -120,49 +120,61 @@ def convert_to_24h_format(time_input):
 
 def extract_routine_details(text, language):
     """
-        Extracts the city and time (hour and minute) from user input text to define a routine.
+    Extracts the city and time (hour and minute) from user input text to define a routine.
 
-        Args:
-            text (str): User input containing routine creation request.
-            language (str): Language code ('de' or 'en') for proper NLP parsing.
+    Args:
+        text (str): User input containing routine creation request.
+        language (str): Language code ('de' or 'en') for proper NLP parsing.
 
-        Returns:
-            tuple: (city, hour, minute) or (None, None, None) if extraction fails.
+    Returns:
+        tuple: (city, hour, minute) or (None, None, None) if extraction fails.
     """
+    print("Original Text:", text)
+
+    # Nutze korrektes spaCy-Modell
     nlp = nlp_de if language == "de" else nlp_en
-    text = text.strip().lower()
 
-    # Ignoriere das Wort "erstelle" am Anfang der Nachricht
-    if text.startswith("erstelle"):
-        text = text[len("erstelle"):].strip()  # Entfernt "erstelle" und führt die Verarbeitung fort
-
-    doc = nlp(text)
+    # Original-Text an spaCy geben (keine Kleinschreibung!)
+    text_cleaned = text.strip()
+    doc = nlp(text_cleaned)
 
     city = None
-    time_match = re.search(r'(\d{1,2})(?::(\d{2}))?\s*(AM|PM|am|pm)?', text, re.IGNORECASE)
 
-    print(time_match)
+    # Zeit (z. B. 7:00, 8pm, 0730AM) mit Regex erkennen (Kleinschreibung hier okay)
+    time_match = re.search(r'(\d{1,2})(?::(\d{2}))?\s*(am|pm)?', text.lower(), re.IGNORECASE)
+    print("Zeit erkannt:", time_match)
 
+    # Ort aus spaCy-Entitäten extrahieren
     for ent in doc.ents:
-        print(ent)
-        if ent.label_ in ("GPE", "LOC") and ent.text.lower() not in ["erstelle"]:
+        print(f"Entität erkannt: {ent.text} – {ent.label_}")
+        if ent.label_ in ("GPE", "LOC") and ent.text.lower() not in ["erstelle", "routine", "für", "um", "eine"]:
             city = ent.text
+            print("Ort erkannt:", city)
             break
-    print(city)
 
+    # Optionaler Fallback: letztes sinnvolles Wort im Text verwenden, wenn keine Entität erkannt wurde
+    if not city:
+        words = text_cleaned.split()
+        for word in reversed(words):
+            word_clean = word.strip(".,!?").lower()
+            if word_clean not in ["erstelle", "routine", "für", "um", "eine", "routinen"]:
+                city = word.strip(".,!?")
+                print("[Fallback] Ort manuell erkannt:", city)
+                break
+
+    # Zeit verarbeiten
     if time_match:
         time_str = time_match.group(0)
         hour, minute = convert_to_24h_format(time_str)
 
-        # Überprüfe, ob die Zeit erfolgreich konvertiert wurde
         if hour is None or minute is None:
-            print("Fehler: Ungültiges Zeitformat")
-            return None, None, None  # Rückgabe von None, wenn die Zeitumwandlung fehlschlägt
+            print("Fehlerhafte Uhrzeit:", time_str)
+            return None, None, None
 
-        print(city, hour, minute)
         return city, hour, minute
 
     return None, None, None
+
 
 def schedule_daily_message(bot, chat_id, city, hour, minute, language):
     """
@@ -203,6 +215,7 @@ def send_daily_routine(bot, chat_id, city, language, hour, minute):
             minute (int): Scheduled minute.
     """
     weather = get_weather(city, language, forecast_day=0)
+    print(weather)
     if weather is None:
         bot.send_message(chat_id,
                          "Leider konnte das Wetter nicht abgerufen werden. Bitte versuche es später noch einmal."

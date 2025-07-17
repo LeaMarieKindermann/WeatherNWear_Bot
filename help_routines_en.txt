@@ -3,17 +3,17 @@
 I'll help you set up daily routines with weather reports and suitable clothing tips - automatically at the right time! ⏰🌦️
 
 📦 Available commands:
-- /routines - Open main menu
+- /routines - Shows all saved routines
 
 💬 Natural language:
 - “Routine at 7:00 in Berlin”
 - “Create routine for 8:30 in Munich”
 - “Show all routines”
 
-🎛️ Menu actions:
-- Add routine - Create new routine
-- Remove routine - Delete scheduled messages
-- Show all - Search saved routines
+🎛️ Features:
+- Add routine
+- Remove routine
+- Show all saved routines
 
 ✨ What I can do:
 - Automatically recognize time & city from text

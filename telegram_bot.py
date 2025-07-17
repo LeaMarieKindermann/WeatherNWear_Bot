@@ -34,7 +34,7 @@ def send_welcome(message):
 
     if user_lang.startswith("de"):
         welcome_text = (
-            f"👋 Hallo, {first_name}! Ich bin *Weather 'n Wear* - dein smarter Telegram-Assistent für alltägliche Outfit-Entscheidungen.\n\n"
+            f"👋 Hallo, {first_name}!\n Ich bin *Weather 'n Wear* - dein smarter Telegram-Assistent für alltägliche Outfit-Entscheidungen.\n\n"
             "Ich kann dir helfen, anhand des aktuellen Wetters und deiner Vorlieben zu entscheiden, was du anziehst. Das kann ich für dich tun:\n\n"
             "🌤 *Abfrage der lokalen Wettervorhersage*\n"
             "👚 *Vorschläge, was du anziehen sollst*\n"
@@ -44,12 +44,12 @@ def send_welcome(message):
             "Sag mir einfach etwas wie:\n"
             "• _“Was soll ich heute in München anziehen?”_\n"
             "• _“Wie ist das Wetter in Berlin?”_\n"
-            "• _“Erstellen eine Routine für 8:30 Uhr in München”_\n\n"
+            "• _“Erstelle eine Routine für 8:30 Uhr in München”_\n\n"
             "Fertig? Lass uns das Anziehen einfacher machen - jeden Tag!"
         )
     else:
         welcome_text = (
-            f"👋 Hello, {first_name}! I’m *Weather ‘n Wear* – your smart Telegram assistant for everyday outfit decisions.\n\n"
+            f"👋 Hello, {first_name}!\n I’m *Weather ‘n Wear* – your smart Telegram assistant for everyday outfit decisions.\n\n"
             "I can help you decide what to wear based on the current weather and your preferences. Here's what I can do for you:\n\n"
             "🌤 *Get the local weather forecast*\n"
             "👚 *Suggest what to wear*\n"

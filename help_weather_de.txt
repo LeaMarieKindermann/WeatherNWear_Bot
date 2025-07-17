@@ -7,7 +7,7 @@ Ich helfe dir dabei, das Wetter für heute oder die nächsten Tage herauszufinde
 • „Wetter in Hamburg am Donnerstag?“
 • „Wie wird das Wetter in 2 Tagen in Mögglingen?“
 
-🎛️ Menü-Aktionen:
+🎛️ Features:
 • Wetter anzeigen – Tagesaktuelle oder 3-Tage-Vorhersage abrufen
 • Ort erkennen – Stadt automatisch aus deiner Nachricht lesen
 • Sprachausgabe – Wetterbericht vorlesen lassen
@@ -16,6 +16,6 @@ Ich helfe dir dabei, das Wetter für heute oder die nächsten Tage herauszufinde
 ✨ Was ich kann:
 • 📍 Städte & Regionen erkennen
 • 📅 Wettervorhersage für heute, morgen & übermorgen
-• 🌤️ Temperatur, Wetterlage, Wind & Luftfeuchtigkeit anzeigen
+• 🌤️ Temperatur und Wetterlage anzeigen
 • 🗣️ Wetterbericht als Sprachnachricht ausgeben
-• 📊 Vorschau auf eine Wettergrafik bereitstellen
+• 📊 Vorschau auf eine Wettergrafik bereitstellen für gesendete Standorte

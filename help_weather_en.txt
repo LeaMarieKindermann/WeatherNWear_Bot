@@ -4,11 +4,11 @@ I'll help you find out the weather for today or the next few days - including te
 
 💬 Natural language:
 - “What will the weather be like tomorrow in Berlin?”
-- “Weather in Hamburg on Thursday”
-- “Weather in Munich in 2 days”
+- “Weather in Hamburg on Thursday?”
+- “What will the weather be like in Mögglingen in 2 days?”
 
-🎛️ Menu actions:
-- Show weather - call up daily or 3-day forecast
-- Recognize location - read city automatically from your message
+🎛️ Features:
+- Display weather - call up daily or 3-day forecast
+- Recognize location - automatically read the city from your message
 - Voice output - Have the weather report read aloud
-- Show weather graphic - Visual preview of the weather situation
+- Display weather graphic - Visual preview of the weather situation at the sent location
