@@ -249,22 +249,20 @@ def send_daily_routine(bot, chat_id, city, language, hour, minute):
             hour (int): Scheduled hour.
             minute (int): Scheduled minute.
     """
-    # Hole das Wetter für die Stadt
     weather = get_weather(city, language, forecast_day=0)
-
-    # Überprüfe, ob das Wetter erfolgreich abgerufen wurde
     if weather is None:
-        bot.send_message(
-            chat_id,
-            "Leider konnte das Wetter nicht abgerufen werden. Bitte versuche es später noch einmal."
-        )
+        bot.send_message(chat_id,
+                         "Leider konnte das Wetter nicht abgerufen werden. Bitte versuche es später noch einmal."
+                         if language == "de" else
+                         "Couldn't retrieve the weather. Please try again later."
+                         )
         return
 
-    # Generiere Kleidungstipps basierend auf den Wetterdaten
-    clothing_tip = generate_clothing_tip(weather["text"], language)
-    mood = random.choice(MOOD_MESSAGES.get(language, MOOD_MESSAGES["en"]))
+    # NEU: Dynamisch generierter Kleidungstipp auf Basis der echten User-Garderobe
+    dt = datetime.now().replace(hour=hour, minute=minute, second=0, microsecond=0)
+    clothing_tip = packing.get_outfit_suggestion(chat_id, weather['location'], dt, language)
 
-    # Bestimme die Tageszeit
+    mood = random.choice(MOOD_MESSAGES.get(language, MOOD_MESSAGES["en"]))
     time_of_day = get_time_of_day(hour)
 
     greetings = {
@@ -282,7 +280,6 @@ def send_daily_routine(bot, chat_id, city, language, hour, minute):
     greeting = greetings.get(time_of_day, greetings["morning"]).get(language, "Hello!")
     t = translations.get(language, translations["en"])
 
-    # Erstelle die Nachricht
     msg = (
         f"{greeting}\n\n"
         f"{t['location']}: {weather['location']}\n\n"
@@ -293,7 +290,6 @@ def send_daily_routine(bot, chat_id, city, language, hour, minute):
     if time_of_day == "morning":
         msg += f"{t['mood']}: {mood}"
 
-    # Sende die Nachricht
     bot.send_message(chat_id, msg)
 
 
