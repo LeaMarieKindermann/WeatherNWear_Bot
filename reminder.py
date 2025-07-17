@@ -69,20 +69,26 @@ def parse_time_expression(text, language):
     Returns a string in 'YYYY-MM-DD HH:MM' (24h) format.
     """
     now = datetime.now()
-    text = text.lower()
+    text_lower = text.lower()
 
     # 0. Relative day expressions
     day_offset = 0
     # German
-    if re.search(r"\bübermorgen\b", text):
+    if re.search(r"\bübermorgen\b", text_lower):
         day_offset = 2
-    elif re.search(r"\bmorgen\b", text):
+    elif re.search(r"\bmorgen\b", text_lower):
         day_offset = 1
     # English
-    elif re.search(r"\bthe day after tomorrow\b", text):
+    elif re.search(r"\bthe day after tomorrow\b", text_lower):
         day_offset = 2
-    elif re.search(r"\btomorrow\b", text):
+    elif re.search(r"\btomorrow\b", text_lower):
         day_offset = 1
+    # German: heute (today)
+    elif re.search(r"\bheute\b", text_lower):
+        day_offset = 0
+    # English: today
+    elif re.search(r"\btoday\b", text_lower):
+        day_offset = 0
 
     # 1. Relative time expressions: "in 10 minutes", "in einer Stunde", "in 2 hours"
     rel_patterns = [
@@ -94,32 +100,40 @@ def parse_time_expression(text, language):
         (r"in\s+an\s*hour", lambda m: now + timedelta(hours=1)),
     ]
     for pattern, func in rel_patterns:
-        match = re.search(pattern, text)
+        match = re.search(pattern, text_lower)
         if match:
             t = func(match)
             return t.strftime("%Y-%m-%d %H:%M")
 
-    # 2. Absolute time expressions (German/English mixed)
+    # 2. Absolute time expressions (with improved AM/PM handling)
     abs_patterns = [
-        r"(\d{1,2}):(\d{2})\s*(uhr)?",         # 14:47, 14:47 Uhr
-        r"(\d{1,2})\s*uhr",                    # 14 Uhr
-        r"(\d{1,2}):(\d{2})\s*(am|pm)",        # 2:47 pm
-        r"(\d{1,2})\s*(am|pm)",                # 2 pm
+        # AM/PM patterns first (more specific)
+        (r"(\d{1,2}):(\d{2})\s*(am|pm)", lambda m: (int(m.group(1)), int(m.group(2)), m.group(3))),
+        (r"(\d{1,2})\s*(am|pm)", lambda m: (int(m.group(1)), 0, m.group(2))),
+        # 24-hour patterns
+        (r"(\d{1,2}):(\d{2})\s*uhr?", lambda m: (int(m.group(1)), int(m.group(2)), None)),
+        (r"(\d{1,2})\s*uhr", lambda m: (int(m.group(1)), 0, None)),
+        # Simple time patterns
+        (r"(\d{1,2}):(\d{2})", lambda m: (int(m.group(1)), int(m.group(2)), None)),
     ]
-    for pattern in abs_patterns:
-        match = re.search(pattern, text)
+    
+    for pattern, parser in abs_patterns:
+        match = re.search(pattern, text_lower)
         if match:
-            hour = int(match.group(1))
-            minute = int(match.group(2)) if match.lastindex >= 2 and match.group(2) and match.group(2).isdigit() else 0
-            ampm = match.group(match.lastindex) if match.lastindex and match.group(match.lastindex) in ("am", "pm") else None
+            hour, minute, ampm = parser(match)
+            
+            # Handle AM/PM conversion
             if ampm:
                 if ampm == "pm" and hour != 12:
                     hour += 12
-                if ampm == "am" and hour == 12:
+                elif ampm == "am" and hour == 12:
                     hour = 0
-            # Use day offset if present
-            date = (now + timedelta(days=day_offset)).strftime("%Y-%m-%d")
-            return f"{date} {hour:02d}:{minute:02d}"
+            
+            # Validate time
+            if 0 <= hour <= 23 and 0 <= minute <= 59:
+                # Use day offset if present
+                target_date = now + timedelta(days=day_offset)
+                return f"{target_date.strftime('%Y-%m-%d')} {hour:02d}:{minute:02d}"
 
     # 3. spaCy fallback (TIME/DATE)
     nlp = nlp_de if language == "de" else nlp_en
@@ -136,8 +150,8 @@ def parse_time_expression(text, language):
                 pass
             norm = normalize_time_string(ent.text)
             if norm:
-                date = (now + timedelta(days=day_offset)).strftime("%Y-%m-%d")
-                return f"{date} {norm}"
+                target_date = now + timedelta(days=day_offset)
+                return f"{target_date.strftime('%Y-%m-%d')} {norm}"
 
     return None
 
@@ -179,39 +193,112 @@ Args:
     language (str): The language of the input text, either "de" for German or "en" for English.
 '''
 def extract_reminder_info(text, language):
+    """
+    Extracts the time and the actual reminder content ("what") from the input text.
+    Uses regex patterns to remove time/date entities and strips common reminder phrases.
+    """
+    original_text = text
     time_str = parse_time_expression(text, language)
-    nlp = nlp_de if language == "de" else nlp_en
-    doc = nlp(text)
+    
+    # Start with the original text
     what = text
-    for ent in doc.ents:
-        if ent.label_ in ("TIME", "DATE"):
-            what = what.replace(ent.text, "")
-
+    
+    # Remove common trigger phrases first
     if language == "de":
-        phrases = [
-            "erinnere mich", "erinner mich", "erinnere", "bitte", "daran", "an"
+        trigger_phrases = [
+            r"\berinnere?\s+mich\b",
+            r"\berinner\s+mich\b", 
+            r"\bsetze?\s+eine?\s+erinnerung\b",
+            r"\breminder\s*:\s*",
+            r"\berinnerung\s*:\s*",
+            r"\bich\s+möchte\s+erinnert\s+werden\b",
+            r"\bbitte\b",
+            r"\bdaran\b",
+            r"\ban\b(?!\s+\d)",  # "an" but not "an 15:00"
         ]
-        what = remove_fuzzy_phrases(what, phrases)
-        # Remove all relative time expressions (short and long forms)
-        what = re.sub(r"\bin \d+\s*(minuten?|min|stunden?|std|h)\b", "", what, flags=re.IGNORECASE)
-        what = re.sub(r"\bin einer stunde\b", "", what, flags=re.IGNORECASE)
-        what = re.sub(r"\bum \d{1,2}(:\d{2})?\s*uhr\b", "", what, flags=re.IGNORECASE)
     else:
-        phrases = [
-            "remind me", "please", "about", "to"
+        trigger_phrases = [
+            r"\bremind\s+me\b",
+            r"\bset\s+a?\s+reminder\b",
+            r"\breminder\s*:\s*",
+            r"\bi\s+want\s+to\s+be\s+reminded\b",
+            r"\bplease\b",
+            r"\babout\b",
+            r"\bto\b(?!\s+\d)",  # "to" but not "to 15:00"
+            r"\bfor\b(?!\s+\d)",  # "for" but not "for 15:00"
         ]
-        what = remove_fuzzy_phrases(what, phrases)
-        # Remove all relative time expressions (short and long forms)
-        what = re.sub(r"\bin \d+\s*(minutes?|min|hours?|h)\b", "", what, flags=re.IGNORECASE)
-        what = re.sub(r"\bin an hour\b", "", what, flags=re.IGNORECASE)
-        # Remove absolute time expressions like "at 3:15pm", "at 3pm", "at 15:15", "at 3:15pm for"
-        what = re.sub(r"\bat \d{1,2}(:\d{2})?\s*(am|pm)?(\s*for)?\b", "", what, flags=re.IGNORECASE)
-
-    what = what.strip(" ,.:;-").strip()
-    if not what and time_str:
-        what = text.replace(time_str, "").strip(" ,.:;-")
+    
+    # Remove trigger phrases
+    for phrase in trigger_phrases:
+        what = re.sub(phrase, "", what, flags=re.IGNORECASE)
+    
+    # Remove time expressions more thoroughly
+    time_patterns = [
+        # Relative day expressions
+        r"\bübermorgen\b",
+        r"\bmorgen\b", 
+        r"\bheute\b",
+        r"\bthe\s+day\s+after\s+tomorrow\b",
+        r"\btomorrow\b",
+        r"\btoday\b",
+        
+        # Time expressions with "um/at"
+        r"\bum\s+\d{1,2}(:\d{2})?\s*(uhr|am|pm)?\b",
+        r"\bat\s+\d{1,2}(:\d{2})?\s*(am|pm)?\b",
+        
+        # Standalone time expressions
+        r"\b\d{1,2}:\d{2}\s*(uhr|am|pm)?\b",
+        r"\b\d{1,2}\s*(uhr|am|pm)\b",
+        
+        # Relative time expressions
+        r"\bin\s+\d+\s*(minuten?|min|stunden?|std|h|minutes?|hours?)\b",
+        r"\bin\s+einer?\s+(stunde|hour)\b",
+        r"\bin\s+an?\s+hour\b",
+        
+        # German time connectors
+        r"\bfür\s+\d",  # "für heute"
+        r"\bam\s+\d",   # but be careful with "am Meeting"
+    ]
+    
+    for pattern in time_patterns:
+        what = re.sub(pattern, "", what, flags=re.IGNORECASE)
+    
+    # Clean up extra whitespace, punctuation and connecting words
+    what = re.sub(r'\s+', ' ', what)  # Multiple spaces to single space
+    what = re.sub(r'^[\s\-:,;.]+|[\s\-:,;.]+$', '', what)  # Remove leading/trailing punctuation
+    what = what.strip()
+    
+    # If we removed too much, try a different approach
+    if not what or len(what) < 3:
+        # Try to extract the content part after time expressions
+        what = original_text
+        
+        # Find the time expression and remove everything before and including it
+        if time_str:
+            # Try to find where the actual content starts
+            time_patterns_for_split = [
+                r".*?(?:erinnere?\s+mich|remind\s+me).*?(?:um|at|an|to)\s+\d{1,2}(:\d{2})?\s*(?:uhr|am|pm)?\s*[-:]?\s*",
+                r".*?(?:setze?\s+eine?\s+erinnerung|set\s+a?\s+reminder).*?(?:für|for)\s+(?:heute|today|morgen|tomorrow)\s+\d{1,2}(:\d{2})?\s*(?:uhr|am|pm)?\s*[-:]?\s*",
+                r".*?reminder\s*:\s*.*?\d{1,2}(:\d{2})?\s*(?:uhr|am|pm)?\s*[-:]?\s*",
+            ]
+            
+            for pattern in time_patterns_for_split:
+                match = re.search(pattern, what, flags=re.IGNORECASE)
+                if match:
+                    what = what[match.end():]
+                    break
+        
+        # Final cleanup
+        what = re.sub(r'^[\s\-:,;.]+|[\s\-:,;.]+$', '', what)
+        what = what.strip()
+    
+    # If still empty, return the original text minus obvious time parts
     if not what:
-        what = text.strip()
+        what = original_text
+        # Remove just the most obvious parts
+        what = re.sub(r'(?:erinnere?\s+mich|remind\s+me|setze?\s+eine?\s+erinnerung|set\s+a?\s+reminder|reminder\s*:)', '', what, flags=re.IGNORECASE)
+        what = what.strip()
+    
     return time_str, what
 
 """
@@ -226,27 +313,35 @@ Args:
     language (str): The language of the reminder.
 """
 def save_reminder(chat_id, time_str, what, language):
+    """
+    Save the reminder information to a JSON file.
+    
+    Args:
+        chat_id (int): The ID of the chat where the reminder is set.
+        time_str (str): The time when the reminder should be sent (already in correct format).
+        what (str): The content of the reminder.
+        language (str): The language of the reminder.
+    """
     reminders_file = "reminders.json"
     reminders = {}
 
-    # Parse time_str to datetime object (today by default)
-    now = datetime.now()
-    try:
-        # Try to parse full datetime if already in that format
-        reminder_dt = datetime.strptime(time_str, "%Y-%m-%d %H:%M")
-        norm_time = reminder_dt.strftime("%Y-%m-%d %H:%M")
-    except ValueError:
-        # Otherwise, assume only time is given, use today
-        norm_time = now.strftime("%Y-%m-%d") + " " + normalize_time_string(time_str)
+    # time_str should already be in the correct format from parse_time_expression
+    if not time_str:
+        print("No valid time provided. Reminder not saved.")
+        return 1
 
-    if not norm_time:
-        print("Invalid time format. Reminder not saved.")
+    # Validate time format
+    try:
+        datetime.strptime(time_str, "%Y-%m-%d %H:%M")
+        norm_time = time_str
+    except ValueError:
+        print(f"Invalid time format: {time_str}. Reminder not saved.")
         return 1
 
     # Load existing reminders if the file exists
     if os.path.exists(reminders_file):
         try:
-            with open(reminders_file, "r") as f:
+            with open(reminders_file, "r", encoding="utf-8") as f:
                 reminders = json.load(f)
         except json.JSONDecodeError:
             reminders = {}
@@ -263,8 +358,8 @@ def save_reminder(chat_id, time_str, what, language):
     })
 
     # Save the updated reminders back to the file
-    with open(reminders_file, "w") as f:
-        json.dump(reminders, f, indent=4)
+    with open(reminders_file, "w", encoding="utf-8") as f:
+        json.dump(reminders, f, ensure_ascii=False, indent=4)
 
     return 0  # Return 0 to indicate success
 

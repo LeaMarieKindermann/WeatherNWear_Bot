@@ -180,13 +180,13 @@ def handle_help(message):
         keyboard.add(InlineKeyboardButton("🗓️ Routinen", callback_data="help_routines"))
         keyboard.add(InlineKeyboardButton("👗 Kleiderschrank", callback_data="help_wardrobe"))
         keyboard.add(InlineKeyboardButton("⏰ Erinnerungen", callback_data="help_reminders"))
-        keyboard.add(InlineKeyboardButton("⏰ Wetter", callback_data="help_weather"))
+        keyboard.add(InlineKeyboardButton("⛅ Wetter", callback_data="help_weather"))
     else:
         keyboard.add(InlineKeyboardButton("👔 Outfit Suggestions", callback_data="help_packing"))
         keyboard.add(InlineKeyboardButton("🗓️ Routines", callback_data="help_routines"))
         keyboard.add(InlineKeyboardButton("👗 Wardrobe", callback_data="help_wardrobe"))
         keyboard.add(InlineKeyboardButton("⏰ Reminders", callback_data="help_reminders"))
-        keyboard.add(InlineKeyboardButton("⏰ Weather", callback_data="help_weather"))
+        keyboard.add(InlineKeyboardButton("⛅ Weather", callback_data="help_weather"))
     
     bot.send_message(message.chat.id, help_text, reply_markup=keyboard, parse_mode="Markdown")
     

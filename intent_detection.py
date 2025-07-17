@@ -8,7 +8,7 @@ class IntentDetector:
     """
     
     def __init__(self):
-        self.threshold = 80
+        self.threshold = 90
         self.intent_config = {
             "de": {
                 "preference": {
@@ -230,14 +230,14 @@ class IntentDetector:
         
         # Priority order for intent detection
         intent_priority = [
-            "weather",
-            "preference",     # Check preferences before packing/wardrobe
             "routine_list",   # Check specific routines before general routine
             "routine_delete", 
-            "packing",        # Main functionality
-            "wardrobe",
             "routine", 
             "reminder",
+            "weather",
+            "preference",     # Check preferences before packing/wardrobe
+            "packing",        # Main functionality
+            "wardrobe",
             "help"
         ]
         

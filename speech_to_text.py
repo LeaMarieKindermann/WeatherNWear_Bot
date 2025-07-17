@@ -8,14 +8,9 @@ ogg_path = "temp.ogg"
 wav_path = "temp.wav"
 
 """
-Helper function to detect the language of a given text.
-
-----
-Args:
-    text (str): The text to analyze.
+Helper function to rerun the helperfunction for language detection.
 """
-def detect_language(text):
-    rerun = 0
+def rerun(text, times):
     """
     Detect the language of a given text using langdetect with confidence scoring.
     Returns the ISO language code (e.g. 'de', 'en').
@@ -64,9 +59,69 @@ def detect_language(text):
     except (LangDetectException, Exception):
         pass
     
-    if rerun < 5:
-        rerun += 1
-        return detect_language(text)
+    if times < 5:
+        times += 1
+        rerun(text, times)
+    # If ML detection fails completely, return None
+    return None
+
+"""
+Helper function to detect the language of a given text.
+
+----
+Args:
+    text (str): The text to analyze.
+"""
+def detect_language(text):
+    """
+    Detect the language of a given text using langdetect with confidence scoring.
+    Returns the ISO language code (e.g. 'de', 'en').
+    Only returns 'de' or 'en' as these are the only supported languages.
+    Uses ML-based detection with multiple attempts for better accuracy.
+    Returns None if no supported language is detected with sufficient confidence.
+    """
+    if not text or not text.strip():
+        return None
+    
+    try:
+        # Try to get confidence scores for all detected languages
+        lang_probs = detect_langs(text)
+        
+        # Filter for supported languages and find the best match
+        supported_langs = {}
+        for lang_prob in lang_probs:
+            if lang_prob.lang in ['de', 'en']:
+                supported_langs[lang_prob.lang] = lang_prob.prob
+        
+        if supported_langs:
+            # Return the language with highest confidence
+            best_lang = max(supported_langs, key=supported_langs.get)
+            confidence = supported_langs[best_lang]
+            
+            # Only return if confidence is reasonable (> 0.1)
+            if confidence > 0.1:
+                return best_lang
+        
+        # Fallback: try simple detect multiple times (langdetect can be inconsistent)
+        detection_results = []
+        for _ in range(5):  # Try 5 times for better accuracy
+            try:
+                detected = detect(text)
+                if detected in ['de', 'en']:
+                    detection_results.append(detected)
+            except LangDetectException:
+                continue
+        
+        if detection_results:
+            # Return most common result
+            from collections import Counter
+            most_common = Counter(detection_results).most_common(1)[0][0]
+            return most_common
+            
+    except (LangDetectException, Exception):
+        pass
+
+    rerun(text, 5)
     # If ML detection fails completely, return None
     return None
 
