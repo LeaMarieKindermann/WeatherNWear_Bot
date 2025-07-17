@@ -170,6 +170,9 @@ def handle_wardrobe_action(call):
 def handle_text(message):
     text = message.text
     language = speech_to_text.detect_language(text)
+    if language is None:
+        bot.reply_to(message, "Es tut mir leid, ich kann nur Deutsch oder Englisch verstehen. Bitte versuche es erneut.\n Sorry I can only understand German or English. Please try again.")
+        return
     intent = intent_detection.detect_intent(text, language)
     print("Intent: " + str(intent))
     response = None
