@@ -1,1 +1,13 @@
-{}
+{
+  "7807161636": {
+    "suggestions": {
+      "Oberteile": "Hoodie",
+      "Hosen": "Jeans",
+      "Jacken": "Jeansjacke",
+      "Schuhe": "Sneaker",
+      "Accessoires": "Sonnenbrille"
+    },
+    "temp": 21,
+    "weather_type": "sunny"
+  }
+}

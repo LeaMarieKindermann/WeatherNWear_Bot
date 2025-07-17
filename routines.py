@@ -6,6 +6,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from weather import get_weather
 import random
 import spacy
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 USER_INFORMATION_FILE = "user_information.json"
 
@@ -31,6 +32,13 @@ MOOD_MESSAGES = {
 }
 
 def load_user_information():
+    """
+        Loads user routine data from the JSON file (user_information.json).
+        If the file is missing, empty, or invalid, returns an empty dictionary.
+
+        Returns:
+            dict: User routine information, keyed by chat_id.
+    """
     if os.path.exists(USER_INFORMATION_FILE):
         with open(USER_INFORMATION_FILE, "r") as f:
             content = f.read().strip()
@@ -48,12 +56,27 @@ def load_user_information():
         return {}  # Rückgabe eines leeren Dictionaries, wenn die Datei nicht existiert
 
 def save_user_information(info):
+    """
+        Saves user routine information to a JSON file (user_information.json).
+
+        Args:
+            info (dict): Dictionary containing routine data to be saved.
+    """
     with open(USER_INFORMATION_FILE, "w") as f:
         json.dump(info, f)
 
 user_info = load_user_information()
 
 def get_time_of_day(hour):
+    """
+        Determines the time of day based on the given hour.
+
+        Args:
+            hour (int): Hour in 24-hour format.
+
+        Returns:
+            str: One of 'morning', 'noon', 'afternoon', or 'night'.
+    """
     if 6 <= hour < 12:
         return "morning"
     elif 12 <= hour < 15:
@@ -65,6 +88,15 @@ def get_time_of_day(hour):
 
 
 def convert_to_24h_format(time_input):
+    """
+        Converts a time string (e.g. '7:30', '0730PM', '18') to 24-hour hour and minute values.
+
+        Args:
+            time_input (str): Input time string (supports formats like '7:00', '7pm', '19').
+
+        Returns:
+            tuple: (hour, minute) as integers, or (None, None) if conversion fails.
+    """
     try:
         # Wenn es bereits im 24h-Format ist, z.B. 18 oder 6
         if time_input.isdigit():
@@ -87,6 +119,16 @@ def convert_to_24h_format(time_input):
         return None, None  # Rückgabe von None, None im Fehlerfall
 
 def extract_routine_details(text, language):
+    """
+        Extracts the city and time (hour and minute) from user input text to define a routine.
+
+        Args:
+            text (str): User input containing routine creation request.
+            language (str): Language code ('de' or 'en') for proper NLP parsing.
+
+        Returns:
+            tuple: (city, hour, minute) or (None, None, None) if extraction fails.
+    """
     nlp = nlp_de if language == "de" else nlp_en
     text = text.strip().lower()
 
@@ -122,6 +164,16 @@ def extract_routine_details(text, language):
     return None, None, None
 
 def generate_clothing_tip(weather_text, language):
+    """
+        Generates a clothing recommendation based on the average temperature in the weather report.
+
+        Args:
+            weather_text (str): The weather description text.
+            language (str): Language code ('de' or 'en').
+
+        Returns:
+            str: A language-specific clothing tip.
+    """
     match = re.search(r'Ø\s*(-?\d+(?:[.,]\d+)?)\s*°C', weather_text)
     if not match:
         return {
@@ -158,6 +210,17 @@ def generate_clothing_tip(weather_text, language):
             return "Perfect t-shirt weather!"
 
 def schedule_daily_message(bot, chat_id, city, hour, minute, language):
+    """
+        Schedules a daily message at a specified time using APScheduler.
+
+        Args:
+            bot: Telegram bot instance.
+            chat_id (int or str): Telegram chat ID of the user.
+            city (str): The city for which the routine is set.
+            hour (int): Hour of the scheduled message.
+            minute (int): Minute of the scheduled message.
+            language (str): Language for the message content.
+    """
     job_id = f"routine_{chat_id}_{city}_{hour:02d}_{minute:02d}"
     if scheduler.get_job(job_id):
         scheduler.remove_job(job_id)
@@ -172,6 +235,18 @@ def schedule_daily_message(bot, chat_id, city, hour, minute, language):
     )
 
 def send_daily_routine(bot, chat_id, city, language, hour, minute):
+    """
+        Sends the daily weather routine message to the user, including weather info,
+        clothing tip, and mood message, adjusted for time of day.
+
+        Args:
+            bot: Telegram bot instance.
+            chat_id (int): User's Telegram chat ID.
+            city (str): City for which weather is fetched.
+            language (str): 'de' or 'en' for message content.
+            hour (int): Scheduled hour.
+            minute (int): Scheduled minute.
+    """
     # Hole das Wetter für die Stadt
     weather = get_weather(city, language, forecast_day=0)
 
@@ -221,12 +296,27 @@ def send_daily_routine(bot, chat_id, city, language, hour, minute):
 
 
 def handle_routine(bot, message, text, language):
+    """
+        Handles all routine-related commands and messages:
+        - Show all routines
+        - Delete routine
+        - Create a new routine (by parsing city + time)
+
+        Args:
+            bot: Telegram bot instance.
+            message: The original Telegram message object.
+            text (str): User message.
+            language (str): 'de' or 'en'.
+
+        Returns:
+            str or None: Optional message to be sent back to the user.
+    """
     chat_id = str(message.chat.id)
     text_lower = text.strip().lower()
 
     print(text_lower)
     # 📌 Command: /routinen anzeigen
-    if text_lower.startswith("/routines"):
+    if text_lower.startswith("/routines") or "show all routines" in text_lower:
         routines = user_info.get(chat_id, [])
         if not routines:
             msg = {
@@ -235,16 +325,21 @@ def handle_routine(bot, message, text, language):
             }.get(language, "No routines found.")
             return msg
 
-        lines = []
-        for i, r in enumerate(routines, 1):
-            lines.append(f"{i}. {r['city']} – {r['hour']:02d}:{r['minute']:02d}")
+        # Routinen-Buttons mit Uhrzeit + Stadt
+        markup = InlineKeyboardMarkup()
+        for i, r in enumerate(routines):
+            routine_text = f"{r['city']} – {r['hour']:02d}:{r['minute']:02d}"
+            button_text = f"❌ {routine_text}"
+            callback_data = f"delete_routine|{chat_id}|{i}|{language}"
+            markup.add(InlineKeyboardButton(button_text, callback_data=callback_data))
 
-        msg = {
-            "de": "🗓️ Deine gespeicherten Routinen:\n\n" + "\n".join(lines) + "\n\nZum Löschen: /routine_löschen <Nummer>",
-            "en": "🗓️ Your saved routines:\n\n" + "\n".join(lines) + "\n\nTo delete: /routine_löschen <number>"
-        }.get(language, "\n".join(lines))
+        header = {
+            "de": "🗓️ Deine gespeicherten Routinen:\n\nWähle eine Routine zum Löschen:",
+            "en": "🗓️ Your saved routines:\n\nSelect a routine to delete:"
+        }.get(language, "Your routines:")
 
-        return msg
+        bot.send_message(chat_id, header, reply_markup=markup)
+        return None
 
     # 📌 Command: /routine_löschen <nummer>
     if text_lower.startswith("/delete_routine"):

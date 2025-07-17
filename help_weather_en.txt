@@ -1,0 +1,15 @@
+🌤️ **Weather**
+
+Get the latest weather report or a 3-day weather forecast for your location!
+
+**💬 Examples:**
+- “What will the weather be like tomorrow in Stuttgart?”
+- “Weather in Berlin today”
+
+**Functions:**
+- Automatic location detection from your text
+- Shows current weather or forecast for today, tomorrow or the day after tomorrow
+- Detailed weather information: Temperature, wind, humidity
+- 3-day forecast including weather graphics & read-aloud function
+
+Translated with DeepL.com (free version)

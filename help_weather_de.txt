@@ -1,0 +1,13 @@
+🌤️ **Wetter**
+
+Erhalte den aktuellen Wetterbericht oder eine 3-Tage-Wettervorhersage für deinen Ort!
+
+**💬 Beispiele:**
+• „Wie wird das Wetter morgen in Stuttgart?“
+• „Wetter in Berlin heute“
+
+**Funktionen:**
+• Automatische Standort-Erkennung aus deinem Text
+• Zeigt aktuelles Wetter oder Vorhersage für heute, morgen oder übermorgen
+• Detaillierte Wetterinfos: Temperatur, Wind, Luftfeuchtigkeit
+• 3-Tage-Vorhersage inklusive Wettergrafik & Vorlese-Funktion

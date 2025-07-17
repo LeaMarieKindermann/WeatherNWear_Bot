@@ -1,4 +1,6 @@
 # Modules to import
+import re
+
 import telebot
 import os
 
@@ -10,6 +12,8 @@ import wardrobe
 import reminder
 import weather
 import requests
+import matplotlib
+from PIL import Image, ImageDraw, ImageFont
 
 import speech_to_text
 import intent_detection
@@ -340,12 +344,191 @@ def handle_help_callback(call):
     
     bot.answer_callback_query(call.id)
 
+
+def get_weather_icon_path(description):
+    """
+        Gibt den Pfad zum passenden Wettersymbol zurück
+    """
+    description = description.lower()
+    if "sunny" in description or "clear" in description or "sonnig" in description:
+        return "assets/icons/sun.png"
+    elif "cloudy" in description or "bewölkt" in description:
+        return "assets/icons/cloud.png"
+    elif "rain" in description or "regenfall" in description:
+        return "assets/icons/rain.png"
+    elif "snow" in description or "schneefall" in description:
+        return "assets/icons/snow.png"
+    elif "fog" in description or "nebel" in description:
+        return "assets/icons/fog.png"
+    elif "drizzle" in description or "nieselregen" in description:
+        return "assets/icons/drizzle.png"
+    elif "ice pellets" in description or "hagel" in description:
+        return "assets/icons/hail.png"
+    elif "sleet shower" in description or "graupelschauer" in description:
+        return "assets/icons/sleet.png"
+    elif "thunder" in description or "gewitter" in description:
+        return "assets/icons/thunder.png"
+    else:
+        return "assets/icons/unknown.png"
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("weather_chart|"))
+def handle_weather_chart_callback(call):
+    """
+        Handles the callback to generate and send a 3-day weather forecast image for the selected location.
+
+        This function:
+        - Fetches weather data for the next 3 days from the API
+        - Extracts average temperature and weather description
+        - Selects the appropriate weather icons
+        - Draws the weather data onto a predefined image template (forecast card)
+        - Sends the generated forecast image back to the Telegram chat
+
+        Steps:
+        1. Reads the location from callback data
+        2. Retrieves weather forecast data for 3 days
+        3. Draws temperatures, descriptions, and icons on the image template
+        4. Sends the completed image as a photo message
+        5. Deletes the temporary image file afterwards
+
+        Args:
+            call: The callback query object from the Telegram bot (contains chat/user info)
+        """
+    location = call.data.split("|", 1)[1]
+    try:
+        user_lang = call.from_user.language_code
+        lang = "de" if user_lang.startswith("de") else "en"
+
+        if lang == "de":
+            background_path = "assets/Forecast_de.png"
+            days = ["Heute", "Morgen", "Übermorgen"]
+            temp_marker = "Ø"
+            regex_marker = "Ø"
+        else:
+            background_path = "assets/Forecast_en.png"
+            days = ["Today", "Tomorrow", "Day After Tomorrow"]
+            temp_marker = "avg"
+            regex_marker = "avg"
+
+        forecast_data = []
+        for day in range(3):
+            data = weather.get_weather(location, lang, day)
+            print(data)
+            if data and "text" in data:
+                if temp_marker in data['text']:
+                    try:
+                        parts = data['text'].split(temp_marker)[1].split("°C")[0].strip()
+                        avg_temp = float(parts)
+                    except:
+                        avg_temp = 0.0
+                else:
+                    avg_temp = 0.0
+
+                pattern = r":\s*(.*?)\,\s*" + re.escape(regex_marker)
+                match = re.search(pattern, data['text'])
+                if match:
+                    desc = match.group(1)
+                else:
+                    desc = "No data" if lang == "en" else "Keine Daten"
+
+                forecast_data.append({
+                    "day": days[day],
+                    "temp": avg_temp,
+                    "desc": desc
+                })
+            else:
+                forecast_data.append({
+                    "day": days[day],
+                    "temp": 0,
+                    "desc": "No data" if lang == "en" else "Keine Daten"
+                })
+
+        # Load the forecast image template
+        base_image = Image.open(background_path).convert("RGBA")
+        draw = ImageDraw.Draw(base_image)
+
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        font_path_regular = os.path.join(base_dir, "assets", "fonts", "Roboto-Regular.ttf")
+        font_path_bold = os.path.join(base_dir, "assets", "fonts", "Roboto-Bold.ttf")
+
+        # Load fonts with desired sizes
+        font_large = ImageFont.truetype(font_path_bold, 40)
+        font_small = ImageFont.truetype(font_path_regular, 25)
+
+        # Draw weather data onto the template
+        card_width = base_image.width // 3
+        draw.text((card_width + 70, 50), f"{location}", font=font_large, fill="black")
+        for i, forecast in enumerate(forecast_data):
+            x_offset = [80, 45, 15]
+            icon_offset = [45, 40, 45]
+            x = i * card_width + x_offset[i]
+            y = 800
+
+            icon_path = get_weather_icon_path(forecast["desc"])
+            print("ICON PATH:", icon_path)
+            if os.path.exists(icon_path):
+                icon = Image.open(icon_path).convert("RGBA").resize((340, 340))
+                base_image.paste(icon, (x - icon_offset[i], 340), icon)
+
+            draw.text((x, y), f"{forecast['temp']}°C", font=font_large, fill="black")
+            draw.text((x, y + 60), forecast["desc"], font=font_small, fill="black")
+
+        # Save and send the image
+        image_path = f"{location}_forecast.png"
+        base_image.save(image_path)
+
+        caption = f"📊 Weather Forecast for {location}" if lang == "en" else f"📊 Wetterkarte für {location}"
+        with open(image_path, "rb") as photo:
+            bot.send_photo(call.message.chat.id, photo, caption=caption)
+
+        os.remove(image_path)
+        bot.answer_callback_query(call.id)
+
+    except Exception as e:
+        print(f"Fehler beim Generieren der Wettergrafik: {e}")
+        bot.answer_callback_query(call.id, text="Fehler beim Erzeugen der Grafik.", show_alert=True)
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("delete_routine|"))
+def handle_delete_routine_callback(call):
+    try:
+        _, chat_id, index, language = call.data.split("|")
+        index = int(index)
+        user_routines = routines.user_info.get(chat_id, [])
+
+        if 0 <= index < len(user_routines):
+            routine = user_routines.pop(index)
+            routines.save_user_information(routines.user_info)
+
+            # Scheduler-Job entfernen
+            job_id = f"routine_{chat_id}_{routine['city']}_{routine['hour']:02d}_{routine['minute']:02d}"
+            if routines.scheduler.get_job(job_id):
+                routines.scheduler.remove_job(job_id)
+
+            # Ausgabe
+            city = routine["city"]
+            time_str = f"{routine['hour']:02d}:{routine['minute']:02d}"
+
+            if language.startswith("de"):
+                msg = f"✅ Routine gelöscht: {time_str} Uhr in {city}."
+            else:
+                msg = f"✅ Routine deleted: {time_str} in {city}."
+
+            bot.edit_message_text(
+                msg,
+                chat_id=call.message.chat.id,
+                message_id=call.message.message_id
+            )
+        else:
+            bot.answer_callback_query(call.id, text="Invalid routine number." if language == "en" else "Ungültige Routinenummer.")
+    except Exception as e:
+        print("Fehler beim Löschen:", e)
+        bot.answer_callback_query(call.id, text="Error while deleting." if "en" in call.data else "Fehler beim Löschen.")
+
 # Set the bot commands    
 bot.set_my_commands([
     telebot.types.BotCommand("start", "Greetings"),
     telebot.types.BotCommand("help", "Show bot features and examples"),
-    telebot.types.BotCommand("routines", "Set Routine"),
-    telebot.types.BotCommand("delete_routine", "Delete a Routine"),
+    telebot.types.BotCommand("routines", "Show all saved routines"),
     telebot.types.BotCommand("kleiderschrank", "Bearbeiten des Kleiderschranks"),
     telebot.types.BotCommand("wardrobe", "Manage your wardrobe")
 ])
