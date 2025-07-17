@@ -136,24 +136,38 @@ def get_weather(city, language, forecast_day):
         dict or None: A dictionary with formatted weather text and location info, or None if the API request failed
     """
 
-    # Step 1: Get lat/lon from city name
-    geo_url = "http://api.openweathermap.org/geo/1.0/direct"
-    geo_params = {
-        "q": city,
-        "limit": 1,
-        "appid": OPEN_API_KEY
-    }
+    # Fix for Eselsberg: use direct coordinates for Ulm-Eselsberg
+    if city.lower() == "eselsberg":
+        lat = 48.4037
+        lon = 9.9563
+        city_name = "Eselsberg"
+    else:
+        # Step 1: Get lat/lon from city name
+        geo_url = "http://api.openweathermap.org/geo/1.0/direct"
+        geo_params = {
+            "q": city,
+            "limit": 1,
+            "appid": OPEN_API_KEY
+        }
 
-    geo_response = requests.get(geo_url, params=geo_params)
-    if geo_response.status_code != 200 or not geo_response.json():
-        return None
+        geo_response = requests.get(geo_url, params=geo_params)
+        if geo_response.status_code != 200 or not geo_response.json():
+            return None
 
-    print(geo_response.json())
+        print(geo_response.json())
 
-    location = geo_response.json()[0]
-    lat = location['lat']
-    lon = location['lon']
-    city_name = location['name']
+        location = geo_response.json()[0]
+        lat = location['lat']
+        lon = location['lon']
+        
+        # Use localized name if available, otherwise fallback to default name
+        local_names = location.get('local_names', {})
+        if language == 'de' and 'de' in local_names:
+            city_name = local_names['de']
+        elif language == 'en' and 'en' in local_names:
+            city_name = local_names['en']
+        else:
+            city_name = location['name']
 
     if forecast_day is None:
         # Current
@@ -171,16 +185,16 @@ def get_weather(city, language, forecast_day):
 
         if language == "de":
             return {
-                'location': data['location']['name'],
-                'text': f"🌤 Aktuelles Wetter in {data['location']['name']}:\n"
+                'location': city_name,
+                'text': f"🌤 Aktuelles Wetter in {city_name}:\n"
                         f"{data['current']['condition']['text']}, {data['current']['temp_c']}°C\n"
                         f"💨 Wind: {data['current']['wind_kph']} km/h\n"
                         f"💧 Luftfeuchtigkeit: {data['current']['humidity']}%"
             }
         else:
             return {
-                'location': data['location']['name'],
-                'text': f"🌤 Current weather in {data['location']['name']}:\n"
+                'location': city_name,
+                'text': f"🌤 Current weather in {city_name}:\n"
                         f"{data['current']['condition']['text']}, {data['current']['temp_c']}°C\n"
                         f"💨 Wind: {data['current']['wind_kph']} km/h\n"
                         f"💧 Humidity: {data['current']['humidity']}%"
@@ -215,8 +229,8 @@ def get_weather(city, language, forecast_day):
             }.get(forecast_day, f"am {date}")
 
             return {
-                'location': data['location']['name'],
-                'text': f"📅 {label} in {data['location']['name']}:\n"
+                'location': city_name,
+                'text': f"📅 {label} in {city_name}:\n"
                         f"{condition}, Ø {avg_temp}°C (⤵ {min_temp}°C / ⤴ {max_temp}°C)"
             }
 
@@ -228,8 +242,8 @@ def get_weather(city, language, forecast_day):
             }.get(forecast_day, f"on {date}")
 
             return {
-                'location': data['location']['name'],
-                'text': f"📅 {label} in {data['location']['name']}:\n"
+                'location': city_name,
+                'text': f"📅 {label} in {city_name}:\n"
                         f"{condition}, avg {avg_temp}°C (min {min_temp}°C / max {max_temp}°C)"
             }
 
