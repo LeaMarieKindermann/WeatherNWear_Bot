@@ -6,7 +6,7 @@ Ich helfe dir dabei, deinen Kleiderschrank zu organisieren und das perfekte Outf
 • `/wardrobe` - Hauptmenü öffnen
 
 **💬 Natürliche Sprache:**
-• "Zeig mir meine Klamotten"
+• "Zeig meine Klamotten"
 
 **🎛️ Menü-Aktionen:**
 • **Artikel hinzufügen** - Neues Kleidungsstück registrieren
