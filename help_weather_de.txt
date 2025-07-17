@@ -1,13 +1,21 @@
-🌤️ **Wetter**
+🌦 Wetter-Assistent
 
-Erhalte den aktuellen Wetterbericht oder eine 3-Tage-Wettervorhersage für deinen Ort!
+Ich helfe dir dabei, das Wetter für heute oder die nächsten Tage herauszufinden – inklusive Temperaturen, Bedingungen und nützlichen Zusatzinfos!
 
-**💬 Beispiele:**
-• „Wie wird das Wetter morgen in Stuttgart?“
-• „Wetter in Berlin heute“
+💬 Natürliche Sprache:
+• „Wie wird das Wetter morgen in Berlin?“
+• „Wetter in Hamburg am Donnerstag“
+• „Weather in Munich in 2 days“
 
-**Funktionen:**
-• Automatische Standort-Erkennung aus deinem Text
-• Zeigt aktuelles Wetter oder Vorhersage für heute, morgen oder übermorgen
-• Detaillierte Wetterinfos: Temperatur, Wind, Luftfeuchtigkeit
-• 3-Tage-Vorhersage inklusive Wettergrafik & Vorlese-Funktion
+🎛️ Menü-Aktionen:
+• Wetter anzeigen – Tagesaktuelle oder 3-Tage-Vorhersage abrufen
+• Ort erkennen – Stadt automatisch aus deiner Nachricht lesen
+• Sprachausgabe – Wetterbericht vorlesen lassen
+• Wettergrafik anzeigen – Visuelle Vorschau der Wetterlage
+
+✨ Was ich kann:
+• 📍 Städte & Regionen erkennen
+• 📅 Wettervorhersage für heute, morgen & übermorgen
+• 🌤️ Temperatur, Wetterlage, Wind & Luftfeuchtigkeit anzeigen
+• 🗣️ Wetterbericht als Sprachnachricht ausgeben
+• 📊 Vorschau auf eine Wettergrafik bereitstellen

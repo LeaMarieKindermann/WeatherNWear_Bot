@@ -5,7 +5,7 @@ import re
 from datetime import datetime, timedelta
 
 from reminder import normalize_time_string
-from wnw_bot_api_token import weather_API_TOKEN
+from wnw_bot_api_token import weather_API_TOKEN, open_API_TOKEN
 # from reminder import parse_time_expression
 from datetime import datetime, timedelta
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -15,6 +15,7 @@ nlp_de = spacy.load("de_core_news_sm")
 nlp_en = spacy.load("en_core_web_sm")
 
 WEATHER_API_KEY = weather_API_TOKEN
+OPEN_API_KEY = open_API_TOKEN
 
 def get_day_index_from_weekday_name(name, language):
     """
@@ -116,6 +117,7 @@ def extract_location(text, language):
 
     for ent in doc.ents:
         if ent.label_ in ("LOC", "GPE"):  # 🔧 <-- Hier der Fix
+            print(ent.text)
             return ent.text
 
     return None
@@ -133,12 +135,32 @@ def get_weather(city, language, forecast_day):
     Returns:
         dict or None: A dictionary with formatted weather text and location info, or None if the API request failed
     """
+
+    # Step 1: Get lat/lon from city name
+    geo_url = "http://api.openweathermap.org/geo/1.0/direct"
+    geo_params = {
+        "q": city,
+        "limit": 1,
+        "appid": OPEN_API_KEY
+    }
+
+    geo_response = requests.get(geo_url, params=geo_params)
+    if geo_response.status_code != 200 or not geo_response.json():
+        return None
+
+    print(geo_response.json())
+
+    location = geo_response.json()[0]
+    lat = location['lat']
+    lon = location['lon']
+    city_name = location['name']
+
     if forecast_day is None:
         # Current
         url = "https://api.weatherapi.com/v1/current.json"
         params = {
             'key': WEATHER_API_KEY,
-            'q': city,
+            'q': f"{lat},{lon}",
             'lang': language
         }
         response = requests.get(url, params=params)
@@ -169,7 +191,7 @@ def get_weather(city, language, forecast_day):
         url = "https://api.weatherapi.com/v1/forecast.json"
         params = {
             'key': WEATHER_API_KEY,
-            'q': city,
+            'q': f"{lat},{lon}",
             'lang': language,
             'days': forecast_day + 1
         }

@@ -1,14 +1,22 @@
-🗓️ **Routinen**
+👤 Routine- & Wetter-Assistent
 
-Erstelle tägliche Routinen für Outfit-Empfehlungen zu festen Zeiten!
+Ich helfe dir dabei, tägliche Routinen mit Wetterberichten und passenden Kleidungstipps einzurichten – automatisch zur richtigen Uhrzeit! ⏰🌦️
 
-**Beispiele:**
-• "Erstelle eine Routine um 7:00 in München"
-• "Routine jeden Morgen um 6:30 in Berlin"
-• "Tägliche Nachricht um 8:15 für Hamburg"
+📦 Verfügbare Befehle:
+• /routines – Hauptmenü öffnen
 
-**Befehle:**
-• `/routines` - Alle Routinen anzeigen
-• `/delete_routine` - Routine löschen
+💬 Natürliche Sprache:
+• „Routine um 7:00 in Berlin“
+• „Routine für 8:30 in München erstellen“
+• „Show all routines“
 
-Du bekommst dann automatisch jeden Tag zur gewählten Zeit eine Outfit-Empfehlung! ⏰
+🎛️ Menü-Aktionen:
+• Routine hinzufügen – Neue Routine anlegen
+• Routine entfernen – Geplante Nachrichten löschen
+• Alle anzeigen – Gespeicherte Routinen durchsuchen
+
+✨ Was ich kann:
+• Uhrzeit & Stadt automatisch aus Text erkennen
+• Tägliche Wetterinfos passend zur Routine schicken
+• Kleidungstipps basierend auf Temperatur geben
+• Stimmungssprüche für einen besseren Start in den Tag senden

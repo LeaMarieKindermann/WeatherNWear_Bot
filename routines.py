@@ -7,6 +7,7 @@ from weather import get_weather
 import random
 import spacy
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+import packing
 
 USER_INFORMATION_FILE = "user_information.json"
 
@@ -139,7 +140,8 @@ def extract_routine_details(text, language):
     doc = nlp(text)
 
     city = None
-    time_match = re.search(r'(\d{1,2}):(\d{2})\s*(AM|PM|am|pm)?', text, re.IGNORECASE)
+    time_match = re.search(r'(\d{1,2})(?::(\d{2}))?\s*(AM|PM|am|pm)?', text, re.IGNORECASE)
+
     print(time_match)
 
     for ent in doc.ents:

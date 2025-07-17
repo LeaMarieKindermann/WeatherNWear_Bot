@@ -1,14 +1,22 @@
-🗓️ **Routines**
+👤 Routine & weather assistant
 
-Create daily routines for outfit suggestions at fixed times!
+I'll help you set up daily routines with weather reports and suitable clothing tips - automatically at the right time! ⏰🌦️
 
-**Examples:**
-• "Create a routine at 7:00 in Munich"
-• "Routine every morning at 6:30 in Berlin"
-• "Daily message at 8:15 for Hamburg"
+📦 Available commands:
+- /routines - Open main menu
 
-**Commands:**
-• `/routines` - Show all routines
-• `/delete_routine` - Delete routine
+💬 Natural language:
+- “Routine at 7:00 in Berlin”
+- “Create routine for 8:30 in Munich”
+- “Show all routines”
 
-You'll automatically get an outfit suggestion every day at your chosen time! ⏰
+🎛️ Menu actions:
+- Add routine - Create new routine
+- Remove routine - Delete scheduled messages
+- Show all - Search saved routines
+
+✨ What I can do:
+- Automatically recognize time & city from text
+- Send daily weather information matching the routine
+- Give clothing tips based on temperature
+- Send mood sayings for a better start to the day

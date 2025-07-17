@@ -1,15 +1,14 @@
-🌤️ **Weather**
+🌦 Weather assistant
 
-Get the latest weather report or a 3-day weather forecast for your location!
+I'll help you find out the weather for today or the next few days - including temperatures, conditions and useful additional information!
 
-**💬 Examples:**
-- “What will the weather be like tomorrow in Stuttgart?”
-- “Weather in Berlin today”
+💬 Natural language:
+- “What will the weather be like tomorrow in Berlin?”
+- “Weather in Hamburg on Thursday”
+- “Weather in Munich in 2 days”
 
-**Functions:**
-- Automatic location detection from your text
-- Shows current weather or forecast for today, tomorrow or the day after tomorrow
-- Detailed weather information: Temperature, wind, humidity
-- 3-day forecast including weather graphics & read-aloud function
-
-Translated with DeepL.com (free version)
+🎛️ Menu actions:
+- Show weather - call up daily or 3-day forecast
+- Recognize location - read city automatically from your message
+- Voice output - Have the weather report read aloud
+- Show weather graphic - Visual preview of the weather situation
