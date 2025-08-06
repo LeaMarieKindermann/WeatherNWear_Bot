@@ -142,7 +142,7 @@ def get_weather(city, language, forecast_day):
         lon = 9.9563
         city_name = "Eselsberg"
     else:
-        # Step 1: Get lat/lon from city name
+        # Step 1: Get latitude/longitude from city name
         geo_url = "http://api.openweathermap.org/geo/1.0/direct"
         geo_params = {
             "q": city,

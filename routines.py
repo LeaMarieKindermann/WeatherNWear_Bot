@@ -325,7 +325,7 @@ def handle_routine(bot, message, text, language):
         else:
             return "Ungültige Routinenummer." if language == "de" else "Invalid routine number."
 
-    # ⏰ Standard: Routine erstellen (bestehender Code)
+    # Standard: Routine erstellen (bestehender Code)
     city, hour, minute = extract_routine_details(text, language)
 
     responses = {
