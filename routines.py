@@ -89,34 +89,39 @@ def get_time_of_day(hour):
 
 def convert_to_24h_format(time_input):
     """
-        Converts a time string (e.g. '7:30', '0730PM', '18') to 24-hour hour and minute values.
-
-        Args:
-            time_input (str): Input time string (supports formats like '7:00', '7pm', '19').
-
-        Returns:
-            tuple: (hour, minute) as integers, or (None, None) if conversion fails.
+    Converts a time string like '7:30', '0730PM', '18', '8 Uhr' to (hour, minute)
     """
     try:
-        # Wenn es bereits im 24h-Format ist, z.B. 18 oder 6
+        time_input = time_input.strip().lower()
+
+        # Nur Zahl → z. B. "8"
         if time_input.isdigit():
             hour = int(time_input)
             minute = 0
-        # Versuche, die Zeit im 12h-Format zu parsen, z.B. 6am, 3pm
-        elif 'am' in time_input.lower() or 'pm' in time_input.lower():
-            time_obj = datetime.strptime(time_input.strip(), '%I%M%p')
-            hour = time_obj.hour
-            minute = time_obj.minute
-        else:
-            # Fallback für alles andere im Format HH:MM
-            time_obj = datetime.strptime(time_input.strip(), '%H:%M')
+
+        # "8am", "0730pm", etc.
+        elif 'am' in time_input or 'pm' in time_input:
+            time_obj = datetime.strptime(time_input, '%I%M%p')
             hour = time_obj.hour
             minute = time_obj.minute
 
+        # HH:MM → z. B. "08:30"
+        elif ":" in time_input:
+            time_obj = datetime.strptime(time_input, '%H:%M')
+            hour = time_obj.hour
+            minute = time_obj.minute
+
+        else:
+            # Fallback: Versuche int-Konvertierung
+            hour = int(time_input)
+            minute = 0
+
         return hour, minute
+
     except Exception as e:
         print(f"Fehler bei der Zeitumwandlung: {e}")
-        return None, None  # Rückgabe von None, None im Fehlerfall
+        return None, None
+
 
 def extract_routine_details(text, language):
     """
@@ -171,6 +176,14 @@ def extract_routine_details(text, language):
             print("Fehlerhafte Uhrzeit:", time_str)
             return None, None, None
 
+        return city, hour, minute
+
+    # Zusätzliche Zeit-Erkennung: "8 Uhr", "13 Uhr", etc.
+    match_uhr = re.search(r'(\d{1,2})\s*uhr', text.lower())
+    if match_uhr:
+        hour = int(match_uhr.group(1))
+        minute = 0
+        print(f"[INFO] Zeit erkannt als 'X Uhr': {hour}:{minute:02d}")
         return city, hour, minute
 
     return None, None, None
